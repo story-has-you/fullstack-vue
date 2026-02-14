@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --brand-primary: #0284c7;
+  --brand-accent: #06b6d4;
+  --surface-base: #f5fbff;
+  --shadow-soft: 0 16px 40px -28px rgba(2, 132, 199, 0.55);
+  --shadow-strong: 0 24px 56px -30px rgba(2, 132, 199, 0.65);
+}
+
+body {
+  background-color: var(--surface-base);
+  color: #0f172a;
+}
+
+.home-page-bg {
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(125, 211, 252, 0.2), transparent 36%),
+    radial-gradient(circle at 86% 14%, rgba(103, 232, 249, 0.2), transparent 40%),
+    linear-gradient(180deg, #f8fcff 0%, #f2f9ff 48%, #eef6ff 100%);
+}
+
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-soft);
+}
+
+@layer components {
+  .section-title {
+    @apply mb-4 flex items-center justify-center gap-2 text-center text-3xl font-bold text-slate-900;
+  }
+
+  .code-block-pre {
+    @apply overflow-x-auto p-3 text-sm leading-relaxed text-slate-100;
+  }
+
+  .chapter-card {
+    @apply cursor-pointer rounded-2xl bg-white p-6 transition-all duration-300;
+  }
+
+  .chapter-card:hover {
+    @apply -translate-y-1;
+  }
+}
