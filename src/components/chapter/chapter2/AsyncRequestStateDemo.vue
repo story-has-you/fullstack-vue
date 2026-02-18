@@ -96,12 +96,34 @@ const resetState = (): void => {
   <section class="mt-4 rounded-2xl border border-cyan-100 bg-cyan-50/60 p-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <p class="text-sm font-semibold text-cyan-900">交互演示：请求状态机</p>
-        <p class="mt-1 text-xs text-cyan-900/80">idle -> loading -> success/error，并支持失败后重试。</p>
+        <p class="text-sm font-semibold text-cyan-900">交互演示：完整的异步请求状态管理</p>
+        <p class="mt-1 text-xs text-cyan-900/80">体验 idle -> loading -> success/error 的完整流程</p>
       </div>
       <span class="rounded-full border px-3 py-1 text-xs font-semibold" :class="statusClass">
         {{ statusLabel }}
       </span>
+    </div>
+
+    <div class="mt-3 rounded-lg border border-cyan-200 bg-white p-3">
+      <p class="text-xs font-semibold text-cyan-900">💡 试试这些操作：</p>
+      <ul class="mt-2 space-y-1 text-xs text-cyan-800">
+        <li class="flex items-start gap-1">
+          <span>1.</span>
+          <span>点击"发起请求"，观察状态从 idle 变为 loading</span>
+        </li>
+        <li class="flex items-start gap-1">
+          <span>2.</span>
+          <span>勾选"下次请求强制失败"，看看 error 状态的处理</span>
+        </li>
+        <li class="flex items-start gap-1">
+          <span>3.</span>
+          <span>在 loading 状态时尝试再次点击，会被防重复机制阻止</span>
+        </li>
+        <li class="flex items-start gap-1">
+          <span>4.</span>
+          <span>请求失败后点击"重试请求"，体验错误恢复流程</span>
+        </li>
+      </ul>
     </div>
 
     <div class="mt-4 flex flex-wrap items-center gap-3">
@@ -163,6 +185,28 @@ const resetState = (): void => {
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">request_count</p>
         <p class="mt-2 text-sm text-slate-800">{{ requestCount }}</p>
       </article>
+    </div>
+
+    <div class="mt-4 rounded-lg border border-cyan-200 bg-white p-3">
+      <p class="text-xs font-semibold text-cyan-900">🎯 为什么这样做</p>
+      <ul class="mt-2 space-y-1 text-xs text-slate-700">
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-1 w-1 rounded-full bg-cyan-500" />
+          <span><span class="font-semibold">四种状态</span>：清晰表达请求的每个阶段，让 UI 能准确响应</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-1 w-1 rounded-full bg-cyan-500" />
+          <span><span class="font-semibold">防重复请求</span>：在 loading 状态时阻止重复点击，避免并发问题</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-1 w-1 rounded-full bg-cyan-500" />
+          <span><span class="font-semibold">错误恢复</span>：失败后保留错误信息，用户可以看到原因并重试</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-1 w-1 rounded-full bg-cyan-500" />
+          <span><span class="font-semibold">状态清理</span>：每次请求前清除旧错误，避免脏状态残留</span>
+        </li>
+      </ul>
     </div>
   </section>
 </template>

@@ -7,7 +7,7 @@ export interface Chapter3CodeSample {
 }
 
 export interface Chapter3ConceptSection {
-  id: '3.1' | '3.2' | '3.3'
+  id: '3.1' | '3.2' | '3.3' | '3.4'
   title: string
   subtitle: string
   what: string[]
@@ -21,110 +21,203 @@ export interface Chapter3Content {
   pageTitle: string
   pageSubtitle: string
   chapterSummary: string
+  formulaRelation?: string
   conceptSections: Chapter3ConceptSection[]
 }
 
 export const chapter3Content: Chapter3Content = {
-  pageTitle: '第三章：组件化架构',
-  pageSubtitle: 'Component Architecture',
+  pageTitle: '第三章：f() - 响应式绑定机制',
+  pageSubtitle: 'Reactive Binding Mechanism',
   chapterSummary:
-    '本章聚焦可维护组件系统的三条主线：纯函数组件确保幂等、单向数据流保证可追溯、副作用生命周期管理避免隐性状态污染。',
+    '本章讲 UI = f(States) 里的 f()：状态变了，界面为什么会自动更新。会用通俗方式讲清 Proxy、依赖收集、调度、v-model 和副作用管理。',
+  formulaRelation:
+    '可以把 f() 理解成“把状态翻译成界面”的函数。状态变化后，Proxy 先感知变更，依赖收集找到受影响组件，调度器合并更新任务，再重算并更新 UI。',
   conceptSections: [
     {
       id: '3.1',
-      title: '纯函数组件 (Pure Components) 与幂等性',
-      subtitle: '同样输入得到同样输出，组件行为可预测、可测试',
+      title: '响应式系统原理',
+      subtitle: 'Proxy 劫持、依赖收集与触发更新调度',
       what: [
-        '在概念上，组件可被理解为输入 Props、输出 UI 的函数。',
-        '当组件只依赖输入且不改写外部状态时，就具备纯函数特征。',
-        '幂等渲染要求同样输入下输出结果稳定，不受历史调用影响。'
+        'Proxy 会拦截数据的读取和写入。',
+        '读取时做依赖收集（track），记录“谁用过这份数据”。',
+        '写入时触发更新（trigger），并交给调度器批量执行。'
       ],
       why: [
-        '可测试性更强：只需要构造输入并断言输出。',
-        '更容易定位问题：同一输入得到不同输出就意味着存在隐式副作用。',
-        '响应式系统更容易优化：依赖不变时可跳过不必要更新。'
+        '不用手写订阅和取消订阅，代码更省心。',
+        '只有依赖了该数据的组件才会更新，范围更准。',
+        '调度会合并同一轮更新，避免重复渲染。'
       ],
       how: [
-        '只读使用 Props，禁止在子组件中直接修改 Props 或全局变量。',
-        '将派生值放入 computed，避免渲染阶段夹杂副作用逻辑。',
-        '把 I/O、订阅、定时器等副作用迁移到生命周期钩子。'
+        '用 `ref` / `reactive` 定义响应式状态。',
+        '在 `computed` 或模板里读取状态时，框架会自动依赖收集。',
+        '多次修改会进入调度队列，统一在下一轮更新。'
       ],
       backendComparisons: [
-        '类似 Spring 无状态 Service：实例长期复用但不持有请求态数据。',
-        '类似 Java 工具方法：输入参数决定输出，方法外部状态不被篡改。',
-        '类似幂等接口设计：重复调用不应让系统状态漂移。'
+        'Proxy 拦截很像 AOP：不改原代码也能加行为。',
+        '调度器像消息队列批处理：先合并，再统一消费。'
       ],
       codeSamples: [
         {
-          id: '3.1-legacy',
-          title: '反例：组件内部依赖可变全局状态',
-          language: 'javascript',
-          tone: 'legacy',
-          code: `const cache = { role: 'USER' }
+          id: '3.1-proxy-basic',
+          title: 'Proxy 劫持基础：get/set 拦截',
+          language: 'typescript',
+          tone: 'modern',
+          code: `// 简化版响应式实现
+let activeEffect: (() => void) | null = null
 
-export function renderBadge(name) {
-  // 每次调用都在悄悄改写外部状态
-  cache.role = cache.role === 'USER' ? 'ADMIN' : 'USER'
+function reactive<T extends object>(target: T): T {
+  return new Proxy(target, {
+    get(obj, key) {
+      // 依赖收集：记录当前 effect 依赖这个属性
+      if (activeEffect) {
+        track(obj, key)
+      }
+      return Reflect.get(obj, key)
+    },
+    set(obj, key, value) {
+      const result = Reflect.set(obj, key, value)
+      // 触发更新：通知所有依赖这个属性的 effect
+      trigger(obj, key)
+      return result
+    }
+  })
+}
 
-  return \`<span>\${name} - \${cache.role}</span>\`
-}`
+const state = reactive({ count: 0 })
+
+// 访问 count 时会触发 get，记录依赖
+console.log(state.count)
+// 修改 count 时会触发 set，执行更新
+state.count++ `
         },
         {
-          id: '3.1-modern',
-          title: '正例：Props + Computed 保持纯净渲染',
+          id: '3.1-vue-reactive',
+          title: 'Vue 3 响应式 API 使用',
           language: 'vue',
           tone: 'modern',
           code: `<script setup lang="ts">
-import { computed } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 
-const props = defineProps<{
-  name: string
-  role: 'ADMIN' | 'USER'
-}>()
+// ref: 包装基本类型
+const count = ref(0)
 
-const displayRole = computed(() => props.role.toUpperCase())
+// reactive: 包装对象
+const state = reactive({
+  message: 'Hello',
+  items: [1, 2, 3]
+})
+
+// computed: 计算属性，自动追踪依赖
+const doubleCount = computed(() => count.value * 2)
+
+// watch: 监听数据变化
+watch(count, (newValue, oldValue) => {
+  console.log(\`count changed from \${oldValue} to \${newValue}\`)
+})
+
+// 修改数据会自动触发 UI 更新
+const increment = () => {
+  count.value++ // 触发 set → trigger → 调度更新 → 重渲染
+}
 </script>
 
 <template>
-  <div class="badge">
-    <span>{{ props.name }}</span>
-    <span>{{ displayRole }}</span>
-  </div>
+  <p>Count: {{ count }}</p>
+  <p>Double: {{ doubleCount }}</p>
+  <button @click="increment">+1</button>
 </template>`
         }
       ]
     },
     {
       id: '3.2',
-      title: '单向数据流 (Unidirectional Data Flow)',
-      subtitle: 'Props 下行，Emits 上行，状态只在拥有者处修改',
+      title: 'MVVM 架构与双向绑定',
+      subtitle: '用绑定器解耦视图与业务状态',
       what: [
-        '父组件通过 Props 向下分发数据，子组件只消费数据。',
-        '子组件通过 Emit 抛出事件请求变更，父组件决定是否更新状态。',
-        '兄弟组件共享状态时，需将状态提升到最近公共父组件。'
+        'MVVM 把页面分成 Model、View、ViewModel 三层。',
+        'ViewModel 负责把状态和界面连接起来。',
+        '输入变化可通过 v-model 回写状态，再触发界面同步。'
       ],
       why: [
-        '数据血缘清晰，状态来源可追溯，调试路径更短。',
-        '避免双向隐式修改带来的“谁改了值”定位困难。',
-        '组件职责更清晰：展示组件不负责业务写操作。'
+        '能减少手写 DOM 事件绑定等胶水代码。',
+        '模板结构调整时，业务逻辑通常不用跟着大改。',
+        '状态更新路径更统一，排查问题更直接。'
       ],
       how: [
-        '在子组件中定义精确 emit 事件签名，避免宽泛事件语义。',
-        '父组件集中处理状态变更和校验规则。',
-        '共享状态优先状态提升，其次再考虑 store。'
+        '给表单状态定义明确的 TypeScript 类型。',
+        '用 `computed` 的 get/set 封装输入规则。',
+        '通过 `v-model` 绑定输入，保持状态和视图同步。'
       ],
       backendComparisons: [
-        '对应 CQRS：Props 更像 Query，Emits 更像 Command。',
-        '类似 Java 方法值传递：子方法不能直接改调用者变量。',
-        '类似分层架构：控制层收命令，服务层决定状态迁移。'
+        'Spring MVC 通常是一次请求一次渲染，MVVM 是状态持续变化、视图持续同步。',
+        'ViewModel 可类比带校验规则的 DTO 适配层。'
       ],
       codeSamples: [
         {
-          id: '3.2-parent',
-          title: '父组件：持有状态并处理命令',
+          id: '3.2-mvvm-vue',
+          title: 'Vue 示例：响应式状态与 v-model',
           language: 'vue',
           tone: 'modern',
           code: `<script setup lang="ts">
+import { computed, ref } from 'vue'
+
+// Model: 领域数据
+const model = ref({
+  message: ''
+})
+
+// ViewModel: 暴露给 View 的绑定层
+const viewModel = computed({
+  get: () => model.value.message,
+  set: (value: string) => {
+    model.value.message = value.trim()
+  }
+})
+</script>
+
+<template>
+  <!-- View: 输入与展示 -->
+  <section>
+    <label>View: Input</label>
+    <input v-model="viewModel" placeholder="Edit me" />
+    <p>ViewModel: {{ viewModel }}</p>
+    <pre>Model: {{ model }}</pre>
+  </section>
+</template>`
+        }
+      ]
+    },
+    {
+      id: '3.3',
+      title: '纯函数组件与单向数据流',
+      subtitle: '同样输入得到同样输出，Props 下行 Emits 上行',
+      what: [
+        '组件可以理解为：输入 props，输出界面。',
+        '单向数据流是“数据向下走，事件向上抛”。',
+        '子组件只读 props，不直接改父状态。'
+      ],
+      why: [
+        '输入和输出关系清楚，测试更容易写。',
+        '状态来源单一，出问题时更容易定位。',
+        '可以减少隐式副作用带来的不确定行为。'
+      ],
+      how: [
+        '子组件中把 props 当只读数据使用。',
+        '写操作通过 `emit` 通知父组件处理。',
+        '派生显示值优先放在 `computed`。'
+      ],
+      backendComparisons: [
+        '像无状态 Service：输入相同，请求结果稳定。',
+        '可类比 CQRS：props 像 Query，emit 像 Command。'
+      ],
+      codeSamples: [
+        {
+          id: '3.3-unidirectional-flow',
+          title: '单向数据流：Props 下行，Emits 上行',
+          language: 'vue',
+          tone: 'modern',
+          code: `<!-- 父组件：持有状态并处理命令 -->
+<script setup lang="ts">
 import { ref } from 'vue'
 import CounterChild from './CounterChild.vue'
 
@@ -136,14 +229,10 @@ const handleIncrement = () => {
 
 <template>
   <CounterChild :count="count" @increment="handleIncrement" />
-</template>`
-        },
-        {
-          id: '3.2-child',
-          title: '子组件：只读 props + emit 事件',
-          language: 'vue',
-          tone: 'neutral',
-          code: `<script setup lang="ts">
+</template>
+
+<!-- 子组件：只读 props + emit 事件 -->
+<script setup lang="ts">
 const props = defineProps<{ count: number }>()
 const emit = defineEmits<{ (e: 'increment'): void }>()
 </script>
@@ -156,32 +245,31 @@ const emit = defineEmits<{ (e: 'increment'): void }>()
       ]
     },
     {
-      id: '3.3',
-      title: '副作用管理 (Side Effects) 与生命周期',
+      id: '3.4',
+      title: '副作用管理与生命周期',
       subtitle: '把副作用放到正确生命周期，避免重渲染污染',
       what: [
-        '副作用是渲染之外的操作，例如请求、订阅、定时器、DOM API。',
-        'Vue 通过 onMounted、watch、onUnmounted 管理副作用时机。',
-        '副作用必须可建立、可更新、可清理，形成完整闭环。'
+        '副作用是渲染外的操作，比如请求、订阅、定时器。',
+        '生命周期钩子决定副作用该在何时开始和结束。',
+        '一个完整副作用要有“创建、更新、清理”三个阶段。'
       ],
       why: [
-        '避免在渲染路径中反复执行副作用导致性能和逻辑问题。',
-        '防止组件销毁后仍持有定时器或监听器造成内存泄漏。',
-        '让组件行为与生命周期阶段严格对齐，降低隐式耦合。'
+        '避免在渲染过程中反复执行副作用造成性能问题。',
+        '及时清理监听和定时器，防止内存泄漏。',
+        '副作用时机固定后，行为更可预测。'
       ],
       how: [
-        '初始化逻辑放在 onMounted 中。',
-        '依赖变化引发的副作用放在 watch 中并处理竞态。',
-        '释放资源统一放在 onUnmounted 中执行。'
+        '初始化放在 `onMounted`。',
+        '依赖变化的处理放在 `watch`。',
+        '释放资源放在 `onUnmounted`。'
       ],
       backendComparisons: [
-        '等价于 Spring 的 @PostConstruct 和 @PreDestroy。',
-        '类似 AOP 在业务前后织入日志、事务、审计等横切逻辑。',
-        '类似连接池借还语义：获取资源后必须归还。'
+        '可类比 Spring 的 `@PostConstruct` 与 `@PreDestroy`。',
+        '像连接池借还：拿到资源后必须归还。'
       ],
       codeSamples: [
         {
-          id: '3.3-lifecycle',
+          id: '3.4-lifecycle',
           title: '生命周期中的副作用闭环',
           language: 'vue',
           tone: 'modern',

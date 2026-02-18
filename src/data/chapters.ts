@@ -24,15 +24,16 @@ export const chapters: Chapter[] = [
     id: 'chapter1',
     number: 1,
     title: '第一章',
-    subtitle: '范式转移',
-    description: '声明式 UI 与 MVVM 架构。从指令式到声明式的思维转变，理解双向绑定的本质。',
-    icon: 'repeat',
+    subtitle: 'UI (用户界面层)',
+    description: '声明式 UI、虚拟 DOM、组件化架构。理解 UI = f(States) 公式中的 UI 层如何从数据驱动渲染。',
+    icon: 'monitor',
     color: 'purple',
     sections: [
-      { id: '1.1', title: '声明式 UI (Declarative UI)' },
-      { id: '1.2', title: 'MVVM 架构与双向绑定' },
-      { id: '1.3', title: '最小示例 1：声明式 UI + 单向命令事件' },
-      { id: '1.4', title: '最小示例 2：MVVM 表单双向绑定' }
+      { id: '1.1', title: '声明式 UI' },
+      { id: '1.2', title: '虚拟 DOM 与 Diff 算法' },
+      { id: '1.3', title: '组件化架构' },
+      { id: '1.4', title: '示例 1：声明式 UI + 单向命令事件' },
+      { id: '1.5', title: '示例 2：列表渲染的 key 策略' }
     ],
     route: '/chapter/1'
   },
@@ -40,15 +41,15 @@ export const chapters: Chapter[] = [
     id: 'chapter2',
     number: 2,
     title: '第二章',
-    subtitle: '运行时环境与异步机制',
-    description: 'JavaScript 单线程模型、事件循环、Promise 与虚拟 DOM。理解前端异步编程的核心机制。',
+    subtitle: 'States (状态层)',
+    description: '状态分类学、状态管理模式、异步状态管理。理解 UI = f(States) 公式中的 States 如何分层治理。',
     icon: 'zap',
     color: 'indigo',
     sections: [
-      { id: '2.1', title: 'JavaScript 单线程模型与事件循环' },
-      { id: '2.2', title: 'Promise 与异步编程' },
-      { id: '2.3', title: '虚拟 DOM 与 Diff 算法' },
-      { id: '2.4', title: '最小示例 3：异步请求状态标准化' }
+      { id: '2.1', title: '状态分类学' },
+      { id: '2.2', title: '状态管理模式' },
+      { id: '2.3', title: '异步状态管理' },
+      { id: '2.4', title: '示例：异步请求状态标准化' }
     ],
     route: '/chapter/2'
   },
@@ -56,14 +57,15 @@ export const chapters: Chapter[] = [
     id: 'chapter3',
     number: 3,
     title: '第三章',
-    subtitle: '组件化架构',
-    description: '纯函数组件、单向数据流与副作用管理。构建可维护的组件化系统。',
-    icon: 'puzzle',
+    subtitle: 'f() - 响应式绑定机制',
+    description: '响应式系统原理、MVVM 双向绑定、纯函数组件、副作用管理。理解 UI = f(States) 公式中的 f() 实现。',
+    icon: 'repeat',
     color: 'cyan',
     sections: [
-      { id: '3.1', title: '纯函数组件与幂等性' },
-      { id: '3.2', title: '单向数据流' },
-      { id: '3.3', title: '副作用管理与生命周期' }
+      { id: '3.1', title: '响应式系统原理' },
+      { id: '3.2', title: 'MVVM 架构与双向绑定' },
+      { id: '3.3', title: '纯函数组件与单向数据流' },
+      { id: '3.4', title: '副作用管理与生命周期' }
     ],
     route: '/chapter/3'
   },
@@ -71,13 +73,14 @@ export const chapters: Chapter[] = [
     id: 'chapter4',
     number: 4,
     title: '第四章',
-    subtitle: '状态管理设计',
-    description: '状态管理分类学与实现模式。从局部状态到全局状态的架构设计。',
-    icon: 'chart',
+    subtitle: '完整应用实践',
+    description: '以本项目为例，展示 States 设计、UI 组件拆分、响应式绑定、交互流程，以及反模式与最佳实践。',
+    icon: 'shield',
     color: 'teal',
     sections: [
-      { id: '4.1', title: '状态管理分类学' },
-      { id: '4.2', title: '详细实现模式' },
+      { id: '4.1', title: '本项目的 UI = f(States) 实践' },
+      { id: '4.2', title: '常见反模式与解决方案' },
+      { id: '4.3', title: '最佳实践总结' }
     ],
     route: '/chapter/4'
   },
@@ -85,14 +88,15 @@ export const chapters: Chapter[] = [
     id: 'chapter5',
     number: 5,
     title: '第五章',
-    subtitle: '渲染模式演进',
-    description: 'CSR、SSR、SSG 三种渲染模式的对比与选择。理解不同渲染模式的适用场景。',
-    icon: 'monitor',
+    subtitle: '执行环境与渲染模式',
+    description: '响应式更新调度、CSR、SSR、SSG。理解"何时何地执行 f(States)"在不同环境下的表现。',
+    icon: 'puzzle',
     color: 'emerald',
     sections: [
-      { id: '5.1', title: '客户端渲染 (CSR)' },
-      { id: '5.2', title: '服务端渲染 (SSR)' },
-      { id: '5.3', title: '静态站点生成 (SSG)' }
+      { id: '5.1', title: '响应式更新调度机制' },
+      { id: '5.2', title: '客户端渲染 (CSR)' },
+      { id: '5.3', title: '服务端渲染 (SSR)' },
+      { id: '5.4', title: '静态站点生成 (SSG)' }
     ],
     route: '/chapter/5'
   },

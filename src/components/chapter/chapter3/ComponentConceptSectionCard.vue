@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import type { Chapter3ConceptSection } from '@/data/chapter3'
 import CodeSnippetPanel from '@/components/chapter/chapter3/CodeSnippetPanel.vue'
+import MvvmArchitectureDiagram from '@/components/chapter/chapter3/MvvmArchitectureDiagram.vue'
+import ReactiveSystemDiagram from '@/components/chapter/chapter3/ReactiveSystemDiagram.vue'
 import UnidirectionalFlowDiagram from '@/components/chapter/chapter3/UnidirectionalFlowDiagram.vue'
 
 interface Props {
@@ -14,7 +16,9 @@ const codeGridClass = computed(() =>
   props.section.codeSamples.length > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'
 )
 
-const showDataFlowDiagram = computed(() => props.section.id === '3.2')
+const showReactiveSystemDiagram = computed(() => props.section.id === '3.1')
+const showMvvmDiagram = computed(() => props.section.id === '3.2')
+const showUnidirectionalFlowDiagram = computed(() => props.section.id === '3.3')
 </script>
 
 <template>
@@ -67,7 +71,9 @@ const showDataFlowDiagram = computed(() => props.section.id === '3.2')
       </ul>
     </section>
 
-    <UnidirectionalFlowDiagram v-if="showDataFlowDiagram" />
+    <ReactiveSystemDiagram v-if="showReactiveSystemDiagram" />
+    <MvvmArchitectureDiagram v-if="showMvvmDiagram" />
+    <UnidirectionalFlowDiagram v-if="showUnidirectionalFlowDiagram" />
 
     <section class="mt-6 grid grid-cols-1 gap-4" :class="codeGridClass">
       <CodeSnippetPanel

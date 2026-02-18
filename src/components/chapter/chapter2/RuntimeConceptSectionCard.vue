@@ -3,6 +3,10 @@ import { computed } from 'vue'
 import type { Chapter2ConceptSection } from '@/data/chapter2'
 import CodeSnippetPanel from '@/components/chapter/chapter2/CodeSnippetPanel.vue'
 import EventLoopTimelineDiagram from '@/components/chapter/chapter2/EventLoopTimelineDiagram.vue'
+import StateBasicDemo from '@/components/chapter/chapter2/StateBasicDemo.vue'
+import StateClassificationDemo from '@/components/chapter/chapter2/StateClassificationDemo.vue'
+import PropDrillingDemo from '@/components/chapter/chapter2/PropDrillingDemo.vue'
+import AsyncStateMachine from '@/components/chapter/chapter2/AsyncStateMachine.vue'
 
 interface Props {
   section: Chapter2ConceptSection
@@ -57,6 +61,16 @@ const showEventLoopDiagram = computed(() => props.section.id === '2.1')
       </ul>
     </section>
 
+    <section v-if="section.analogies && section.analogies.length > 0" class="mt-4 rounded-2xl border border-purple-100 bg-purple-50/70 p-4">
+      <h3 class="text-base font-semibold text-purple-900">生活化类比</h3>
+      <ul class="mt-3 space-y-2 text-sm leading-relaxed text-purple-900/85">
+        <li v-for="item in section.analogies" :key="item" class="flex items-start gap-2">
+          <span class="mt-2 h-1.5 w-1.5 rounded-full bg-purple-500" />
+          <span>{{ item }}</span>
+        </li>
+      </ul>
+    </section>
+
     <section class="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4">
       <h3 class="text-base font-semibold text-indigo-900">后端对比映射</h3>
       <ul class="mt-3 space-y-2 text-sm leading-relaxed text-indigo-900/85">
@@ -68,6 +82,11 @@ const showEventLoopDiagram = computed(() => props.section.id === '2.1')
     </section>
 
     <EventLoopTimelineDiagram v-if="showEventLoopDiagram" />
+
+    <StateBasicDemo v-if="section.demoComponent === 'StateBasicDemo'" />
+    <StateClassificationDemo v-if="section.demoComponent === 'StateClassificationDemo'" />
+    <PropDrillingDemo v-if="section.demoComponent === 'PropDrillingDemo'" />
+    <AsyncStateMachine v-if="section.demoComponent === 'AsyncStateMachine'" />
 
     <section class="mt-6 grid grid-cols-1 gap-4" :class="codeGridClass">
       <CodeSnippetPanel

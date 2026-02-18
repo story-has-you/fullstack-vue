@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import type { Chapter1ConceptSection } from '@/data/chapter1'
 import CodeSnippetPanel from '@/components/chapter/chapter1/CodeSnippetPanel.vue'
-import MvvmArchitectureDiagram from '@/components/chapter/chapter1/MvvmArchitectureDiagram.vue'
 
 interface Props {
   section: Chapter1ConceptSection
@@ -13,8 +12,6 @@ const props = defineProps<Props>()
 const codeGridClass = computed(() =>
   props.section.codeSamples.length > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'
 )
-
-const showMvvmDiagram = computed(() => props.section.id === '1.2')
 </script>
 
 <template>
@@ -66,8 +63,6 @@ const showMvvmDiagram = computed(() => props.section.id === '1.2')
         </li>
       </ul>
     </section>
-
-    <MvvmArchitectureDiagram v-if="showMvvmDiagram" />
 
     <section class="mt-6 grid grid-cols-1 gap-4" :class="codeGridClass">
       <CodeSnippetPanel

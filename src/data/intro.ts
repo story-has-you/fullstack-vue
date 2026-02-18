@@ -17,6 +17,13 @@ export interface BindingEvolution {
   readonly conclusion: string
 }
 
+export interface FormulaRationale {
+  readonly title: string
+  readonly why: readonly string[]
+  readonly backendAnalogy: readonly string[]
+  readonly implications: readonly string[]
+}
+
 /**
  * 前言页面内容模型
  */
@@ -26,6 +33,7 @@ export interface IntroContent {
   readonly lead: string
   readonly formula: string
   readonly formulaExplanation: string
+  readonly formulaRationale?: FormulaRationale
   readonly pillars: readonly IntroPillar[]
   readonly bindingEvolution: BindingEvolution
 }
@@ -39,6 +47,27 @@ export const introContent = {
   lead: '抛开所有框架和工具的噪音，现代前端开发的核心仅包含三个要素：UI、数据、以及两者的绑定。',
   formula: 'UI = f(states)',
   formulaExplanation: '现代化前端可以用一个公式说明：界面是状态的纯函数投影。',
+  formulaRationale: {
+    title: '为什么是公式，而不是模式？',
+    why: [
+      '公式具有数学的确定性：同样的 states 输入，必然产生同样的 UI 输出（幂等性）。',
+      '公式强调函数式思维：f() 应该是纯函数，不产生副作用，可预测、可测试。',
+      '公式揭示本质规律：UI 的任何变化都源于 states 的变化，单一数据源是唯一真相。',
+      '模式是经验总结，公式是理论抽象：掌握公式后，各种框架和模式都是具体实现。'
+    ],
+    backendAnalogy: [
+      '类似后端的 Response = Controller(Request)：请求决定响应，中间是确定的映射关系。',
+      '类似数据库的 Result = Query(Data)：查询语句和数据集决定结果集，关系是确定的。',
+      '类似函数式编程的 Output = f(Input)：强调不可变性和纯函数，避免隐式状态。',
+      '后端同学理解了"请求-响应"模型，就能类比理解"状态-界面"模型。'
+    ],
+    implications: [
+      '组件幂等性：同样的 props（状态输入）总能渲染出同样的 UI（输出）。',
+      '单向数据流：States 变化驱动 UI 更新，UI 不能反向修改 States（除非通过事件上抛）。',
+      '副作用隔离：f() 应该是纯函数，副作用（请求、订阅）要放在生命周期钩子中管理。',
+      '可测试性：给定 states，断言 UI 输出，无需关心 f() 内部实现细节。'
+    ]
+  },
   pillars: [
     {
       id: 'ui',

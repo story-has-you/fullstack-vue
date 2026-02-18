@@ -27,31 +27,31 @@ const router = createRouter({
       path: '/chapter/1',
       name: 'chapter1',
       component: Chapter1View,
-      meta: { title: '全栈思维跃迁 - 第一章：范式转移' }
+      meta: { title: '全栈思维跃迁 - 第一章：UI (用户界面层)' }
     },
     {
       path: '/chapter/2',
       name: 'chapter2',
       component: Chapter2View,
-      meta: { title: '全栈思维跃迁 - 第二章：运行时环境与异步机制' }
+      meta: { title: '全栈思维跃迁 - 第二章：States (状态层)' }
     },
     {
       path: '/chapter/3',
       name: 'chapter3',
       component: Chapter3View,
-      meta: { title: '全栈思维跃迁 - 第三章：组件化架构' }
+      meta: { title: '全栈思维跃迁 - 第三章：f() - 响应式绑定机制' }
     },
     {
       path: '/chapter/4',
       name: 'chapter4',
       component: Chapter4View,
-      meta: { title: '全栈思维跃迁 - 第四章：状态管理设计' }
+      meta: { title: '全栈思维跃迁 - 第四章：完整应用实践' }
     },
     {
       path: '/chapter/5',
       name: 'chapter5',
       component: Chapter5View,
-      meta: { title: '全栈思维跃迁 - 第五章：渲染模式演进' }
+      meta: { title: '全栈思维跃迁 - 第五章：执行环境与渲染模式' }
     },
     {
       path: '/chapter/6',

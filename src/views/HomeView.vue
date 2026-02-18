@@ -16,11 +16,10 @@ const navigateToChapter = (route: string) => {
 }
 
 /**
- * 分离前言、主要章节和结语
+ * 分离前言与主要章节
  */
 const introChapter = chapters.find(c => c.id === 'intro')
 const mainChapters = chapters.filter(c => c.number >= 1 && c.number <= 6)
-const epilogueChapter = chapters.find(c => c.id === 'epilogue')
 const firstMainChapter = mainChapters[0]
 
 const heroFacts = [
@@ -55,8 +54,8 @@ const learningPaths: LearningPath[] = [
   {
     id: 'architecture',
     title: '架构篇',
-    range: '第 6 章 + 结语',
-    detail: '完成全栈思维与安全边界闭环',
+    range: '第 6 章',
+    detail: '完成全栈思维与工程化闭环',
     icon: 'architecturePath'
   }
 ]
@@ -145,20 +144,6 @@ const learningPaths: LearningPath[] = [
             :key="chapter.id"
             :chapter="chapter"
             @click="navigateToChapter(chapter.route)"
-          />
-        </div>
-      </section>
-
-      <!-- 结语卡片 -->
-      <section v-if="epilogueChapter" class="mb-12">
-        <h2 class="section-title">
-          <component :is="homeIconMap.epilogue" class="h-6 w-6 text-sky-600" />
-          总结与展望
-        </h2>
-        <div class="max-w-2xl mx-auto">
-          <ChapterCard
-            :chapter="epilogueChapter"
-            @click="navigateToChapter(epilogueChapter.route)"
           />
         </div>
       </section>

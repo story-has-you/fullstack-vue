@@ -7,7 +7,7 @@ export interface Chapter1CodeSample {
 }
 
 export interface Chapter1ConceptSection {
-  id: '1.1' | '1.2'
+  id: '1.1' | '1.2' | '1.3'
   title: string
   subtitle: string
   what: string[]
@@ -18,7 +18,7 @@ export interface Chapter1ConceptSection {
 }
 
 export interface Chapter1ExampleSection {
-  id: '1.3' | '1.4'
+  id: '1.4' | '1.5'
   title: string
   scenario: string
   codeSample: Chapter1CodeSample
@@ -30,38 +30,39 @@ export interface Chapter1Content {
   pageTitle: string
   pageSubtitle: string
   chapterSummary: string
+  formulaRelation?: string
   conceptSections: Chapter1ConceptSection[]
   exampleSections: Chapter1ExampleSection[]
 }
 
 export const chapter1Content: Chapter1Content = {
-  pageTitle: '第一章：范式转移',
-  pageSubtitle: 'The Paradigm Shift',
+  pageTitle: '第一章：UI (用户界面层)',
+  pageSubtitle: 'User Interface Layer',
   chapterSummary:
-    '本章聚焦后端到前端的首个认知跃迁：从“手动操作 DOM 的脚本思维”，转向“状态驱动渲染的架构思维”，并通过最小示例理解声明式 UI 与 MVVM 双向绑定。',
+    '本章只讲 UI 层：怎么用声明式写法描述界面、怎么用组件拆分页面、以及虚拟 DOM 如何高效更新。目标是用“看状态写界面”替代手动改 DOM。',
+  formulaRelation:
+    '在 UI = f(States) 中，第一章关注左侧的 UI。你负责描述“状态对应什么界面”，框架负责计算和更新。声明式 UI 管表达，组件化管组织，虚拟 DOM 管高效落地。',
   conceptSections: [
     {
       id: '1.1',
       title: '声明式 UI (Declarative UI)',
       subtitle: '描述目标状态，而非编排 UI 变更步骤',
       what: [
-        '声明式编程关注“界面在当前状态下应该是什么样”，而不是“如何一步步把界面改成目标样子”。',
-        '开发者只维护状态，框架负责将状态映射到 DOM。'
+        '声明式写法只关心“现在应该显示什么界面”。',
+        '你改状态，框架自动把结果同步到 DOM。'
       ],
       why: [
-        '可预测性与幂等性：同一 State 总能渲染出同一 UI。',
-        '复杂交互时，复杂度被限制在数据层，不再扩散到 DOM 操作细节。',
-        '底层渲染优化（批量更新、调度）可由框架演进，不影响业务代码。'
+        '同一份状态会得到同一份界面，结果更可预测。',
+        '状态分支比手写 DOM 增删改更容易维护。',
+        '底层更新策略可以升级，不影响业务代码写法。'
       ],
       how: [
-        '把“加载态、权限态、空态”表达为状态分支，而不是 DOM 增删改脚本。',
-        '遵循“数据是唯一真相”，避免并行维护状态与 DOM。'
+        '把加载态、空态、权限态写成明确的状态分支。',
+        '避免在业务代码里直接 querySelector 改节点。'
       ],
       backendComparisons: [
-        'SQL 查询（声明式）：例如 SELECT * FROM users WHERE age > 18，你只声明目标结果，不写索引选择、扫描顺序和连接细节。',
-        'K8s YAML（期望状态）：spec.replicas: 3 只描述目标副本数；Controller 持续 Reconcile，把 Current State 收敛到 Desired State。',
-        'Vue 模板同构思维：<button :disabled="isLoading"> 只声明期望 UI 状态，框架在响应式更新时自动 patch DOM。',
-        '在两者里都应避免“手工补丁”：后端避免手动改 etcd 状态，前端避免直接 querySelector 改节点。'
+        '像 SQL 一样，你声明目标结果，不手写执行细节。',
+        '像 K8s 声明副本数一样，你写期望状态，系统负责收敛。'
       ],
       codeSamples: [
         {
@@ -109,59 +110,142 @@ defineProps(['user', 'isLoading'])
     },
     {
       id: '1.2',
-      title: 'MVVM 架构与双向绑定',
-      subtitle: '用绑定器解耦视图与业务状态',
+      title: '虚拟 DOM 与 Diff 算法',
+      subtitle: '内存中比较，输出最小补丁，减少真实 DOM 开销',
       what: [
-        'MVVM 将 UI 分为 Model、View、ViewModel 三层。',
-        'ViewModel 作为中间层，把业务状态变化自动同步给 View。'
+        '虚拟 DOM 是 UI 的内存快照，用对象树描述界面。',
+        '更新时先比较新旧快照，再计算最小改动。',
+        'Diff 主要做同层比较，兼顾效果和性能。'
       ],
       why: [
-        '减少 document.querySelector 与 addEventListener 等胶水代码。',
-        'HTML 结构调整时，只要绑定语义不变，业务逻辑可保持稳定。',
-        '观察者式同步机制让 UI 状态更新更一致。'
+        '直接频繁改真实 DOM 成本高，容易触发布局和重绘。',
+        '先在内存里比较，可以减少不必要的真实操作。',
+        '你只管写“新界面长什么样”，框架负责最小更新。'
       ],
       how: [
-        'Vue 3 使用 Proxy 劫持数据读写，实现响应式追踪。',
-        '通过 v-model 建立输入控件与响应式状态的双向同步。',
-        '在 TypeScript 下为表单状态建模，避免 any 带来的失控。'
+        '列表必须使用稳定 key，优先用业务 id。',
+        '不要用 index 当 key，排序后容易状态错位。',
+        '尽量保持结构稳定，把变化集中在文本和属性。'
       ],
       backendComparisons: [
-        'Spring MVC 常见流程是 Request -> Controller -> Model -> View，一次请求完成一次渲染；MVVM 则是状态持续变化、视图持续同步。',
-        '可把 ViewModel 理解为“可观察的领域对象”：类似 Java Bean + PropertyChangeListener，属性变更会通知订阅者刷新 UI。',
-        'Observer / Pub-Sub 映射：Model 变更触发事件，View 订阅并重渲染；对应消息队列里 producer 发布、consumer 消费。',
-        '双向绑定补充：输入框修改会反向更新 Model，再由响应式系统正向刷新其余依赖视图，形成受控闭环。',
-        '工程约束对应后端 DTO 校验：前端表单状态需强类型（如 nickname/email），等价于后端避免 Map<String, Object> 泛型失控。'
+        '像数据库 Buffer Pool：先在内存处理，再批量落盘。',
+        '前端 key 像数据库主键，用来标识“谁是谁”。'
       ],
       codeSamples: [
         {
-          id: '1.2-mvvm-vue',
-          title: 'Vue 示例：响应式状态与 v-model',
+          id: '1.2-vnode',
+          title: '虚拟 DOM 节点（轻量对象）',
+          language: 'typescript',
+          tone: 'neutral',
+          code: `type VNode = {
+  tag: string
+  props?: Record<string, string>
+  children?: Array<VNode | string>
+}
+
+const vNode: VNode = {
+  tag: 'section',
+  props: { class: 'card' },
+  children: [
+    { tag: 'h2', children: ['UI Chapter'] },
+    { tag: 'p', children: ['Virtual DOM is an in-memory representation.'] }
+  ]
+}`
+        },
+        {
+          id: '1.2-key',
+          title: '列表渲染：稳定 key 映射实体身份',
           language: 'vue',
           tone: 'modern',
           code: `<script setup lang="ts">
-import { computed, ref } from 'vue'
+interface Task {
+  id: string
+  title: string
+}
 
-// Model: 领域数据
-const model = ref({
-  message: ''
-})
-
-// ViewModel: 暴露给 View 的绑定层
-const viewModel = computed({
-  get: () => model.value.message,
-  set: (value: string) => {
-    model.value.message = value.trim()
-  }
-})
+defineProps<{ tasks: Task[] }>()
 </script>
 
 <template>
-  <!-- View: 输入与展示 -->
+  <li v-for="task in tasks" :key="task.id">
+    {{ task.title }}
+  </li>
+</template>`
+        }
+      ]
+    },
+    {
+      id: '1.3',
+      title: '组件化架构',
+      subtitle: 'UI 的模块化拆分与复用',
+      what: [
+        '组件是可复用的 UI 模块，封装结构、样式和交互。',
+        '大页面可以拆成小组件，职责更清晰。',
+        '组件接收输入（props）后输出对应界面。'
+      ],
+      why: [
+        '重复 UI 能复用，减少重复代码。',
+        '组件边界清楚后，协作和修改都更安全。',
+        '每个组件可单独测试和调试，排错更快。'
+      ],
+      how: [
+        '按单一职责拆分，一个组件只做一件事。',
+        '用 props 下发数据，用 emits 上抛事件。',
+        '复杂场景可分展示组件和容器组件。'
+      ],
+      backendComparisons: [
+        '像后端分层：Controller、Service 各自负责一块。',
+        'props 像方法参数，emits 像回调或事件通知。'
+      ],
+      codeSamples: [
+        {
+          id: '1.3-component',
+          title: '组件拆分：展示组件与容器组件',
+          language: 'vue',
+          tone: 'modern',
+          code: `<!-- UserCard.vue (展示组件) -->
+<script setup lang="ts">
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+defineProps<{ user: User }>()
+const emit = defineEmits<{ (e: 'edit', userId: number): void }>()
+</script>
+
+<template>
+  <article class="user-card">
+    <h3>{{ user.name }}</h3>
+    <p>{{ user.email }}</p>
+    <button @click="emit('edit', user.id)">Edit</button>
+  </article>
+</template>
+
+<!-- UserListContainer.vue (容器组件) -->
+<script setup lang="ts">
+import { ref } from 'vue'
+import UserCard from './UserCard.vue'
+
+const users = ref([
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@example.com' }
+])
+
+const handleEdit = (userId: number) => {
+  console.log('编辑用户', userId)
+}
+</script>
+
+<template>
   <section>
-    <label>View: Input</label>
-    <input v-model="viewModel" placeholder="Edit me" />
-    <p>ViewModel: {{ viewModel }}</p>
-    <pre>Model: {{ model }}</pre>
+    <UserCard
+      v-for="user in users"
+      :key="user.id"
+      :user="user"
+      @edit="handleEdit"
+    />
   </section>
 </template>`
         }
@@ -170,11 +254,11 @@ const viewModel = computed({
   ],
   exampleSections: [
     {
-      id: '1.3',
+      id: '1.4',
       title: '最小示例 1：声明式 UI + 单向命令事件',
       scenario: '后端同学常见写法是手动操作 DOM。状态一多，UI 与数据容易分裂。',
       codeSample: {
-        id: '1.3-example',
+        id: '1.4-example',
         title: 'DeclarativePermissionButton.vue',
         language: 'vue',
         tone: 'neutral',
@@ -215,43 +299,54 @@ const canDelete = computed(() => !props.isLoading && props.user.role === 'ADMIN'
       ]
     },
     {
-      id: '1.4',
-      title: '最小示例 2：MVVM 表单双向绑定',
-      scenario: '输入框变化需要实时同步到状态，同时保留类型约束。',
+      id: '1.5',
+      title: '最小示例 2：列表渲染的 key 策略',
+      scenario: '列表数据发生插入、删除、排序时，如何保证组件实例不被错误复用。',
       codeSample: {
-        id: '1.4-example',
-        title: 'MvvmForm.vue',
+        id: '1.5-example',
+        title: 'TaskList.vue',
         language: 'vue',
         tone: 'neutral',
         code: `<script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
-interface ProfileForm {
-  nickname: string
-  email: string
+interface Task {
+  id: string
+  title: string
+  completed: boolean
 }
 
-const form = ref<ProfileForm>({
-  nickname: '',
-  email: ''
-})
+const tasks = ref<Task[]>([
+  { id: 'a', title: 'Task A', completed: false },
+  { id: 'b', title: 'Task B', completed: false },
+  { id: 'c', title: 'Task C', completed: false }
+])
 
-watch(form, (value) => {
-  console.log('sync draft', value)
-}, { deep: true })
+const shuffle = () => {
+  tasks.value = [...tasks.value].sort(() => Math.random() - 0.5)
+}
+
+const toggle = (id: string) => {
+  const task = tasks.value.find(t => t.id === id)
+  if (task) task.completed = !task.completed
+}
 </script>
 
 <template>
-  <input v-model.trim="form.nickname" placeholder="nickname" />
-  <input v-model.trim="form.email" placeholder="email" />
-  <pre>{{ form }}</pre>
+  <button @click="shuffle">Shuffle</button>
+  <ul>
+    <li v-for="task in tasks" :key="task.id">
+      <input type="checkbox" :checked="task.completed" @change="toggle(task.id)" />
+      {{ task.title }}
+    </li>
+  </ul>
 </template>`
       },
-      runGuide: '将组件接入路由页面，输入内容即可观察 View 与 Model 的双向同步。',
+      runGuide: '将组件挂到任意页面,点击 Shuffle 打乱顺序,观察复选框状态是否跟随正确的任务项。如果用 index 作为 key,状态会错位。',
       antiPatterns: [
-        'v-model 绑定到未初始化字段。',
-        '使用 any 放弃表单结构约束。',
-        '直接替换深层对象导致响应式链路不稳定。'
+        '使用 index 作为 key,导致排序时状态错位。',
+        '使用不稳定的随机值作为 key,每次渲染都重建组件。',
+        '在列表项中使用副作用但不提供 key,导致复用逻辑混乱。'
       ]
     }
   ]
