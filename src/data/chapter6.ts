@@ -116,21 +116,50 @@ export const chapter6Content: Chapter6Content = {
       id: '6.1',
       title: '包管理：依赖治理',
       subtitle: 'npm / yarn / pnpm 的工程语义',
-      what: ['包管理决定依赖解析、锁文件和安装一致性。'],
-      why: ['统一依赖版本可降低“本地可跑，线上失败”的风险。'],
-      how: ['团队统一 pnpm 与 lockfile 策略。'],
-      backendComparisons: ['对应 Maven/Gradle 的依赖治理。'],
+      what: [
+        '包管理器本质是三件事：依赖解析器、锁文件生成器、node_modules 布局器。',
+        'npm / yarn / pnpm 的核心差异，不在命令名，而在依赖存储模型与可见性规则。',
+        '它直接决定是否容易出现幽灵依赖、重复安装和“机器相关”的构建结果。'
+      ],
+      why: [
+        '统一安装模型与锁文件策略，才能保证 CI、预发、生产的依赖图一致。',
+        '依赖治理是供应链安全入口：版本漂移、恶意包、错误 peerDependencies 都在这里暴露。',
+        'Monorepo 场景下，包管理策略会显著影响安装耗时、磁盘占用与团队协作成本。'
+      ],
+      how: [
+        '统一 `packageManager` 字段 + Corepack，锁定团队使用同一包管理器和版本。',
+        'CI 强制 `--frozen-lockfile`（或等价策略），禁止流水线自动改锁文件。',
+        '将“新增依赖审批、升级节奏、漏洞修复窗口”纳入工程规范，而不只是个人习惯。'
+      ],
+      backendComparisons: [
+        '对应 Maven/Gradle 的依赖解析 + 本地缓存 + 版本锁定策略。',
+        '前端 lockfile ≈ 后端 dependency lock/BOM：目标都是构建可复现。'
+      ],
       codeSamples: [
         {
           id: '6.1-script',
-          title: '统一脚本入口',
+          title: '统一依赖治理入口（package.json）',
           language: 'javascript',
           tone: 'modern',
           code: `{
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "bootstrap": "pnpm install --frozen-lockfile",
     "type-check": "vue-tsc --noEmit",
     "build": "pnpm run type-check && vite build"
+  }
+}`
+        },
+        {
+          id: '6.1-policy',
+          title: '安装策略基线（团队约束示例）',
+          language: 'javascript',
+          tone: 'neutral',
+          code: `{
+  "governance": {
+    "lockfilePolicy": "immutable-in-ci",
+    "dependencyReview": "new-package-rfc",
+    "securityPatchSla": "critical-within-24h"
   }
 }`
         }
@@ -216,26 +245,26 @@ const Dashboard = defineAsyncComponent(() => import('./Dashboard.vue'))`
     {
       id: 'npm',
       title: 'npm',
-      subtitle: '默认生态入口',
-      strengths: ['开箱可用', '生态资料丰富'],
-      caveats: ['依赖复用效率一般'],
-      backendComparison: '类似通用 Maven 方案。'
+      subtitle: '官方默认：兼容优先，扁平安装（hoist）',
+      strengths: ['与 npm registry 生态兼容性最好', '默认可用、上手成本最低', 'package-lock 生态成熟'],
+      caveats: ['大型仓库的磁盘复用与安装效率通常弱于 pnpm', 'hoist 模式下更容易“误用未声明依赖”'],
+      backendComparison: '类似后端“默认 Maven 路径”：通用性强、迁移门槛低。'
     },
     {
       id: 'yarn',
       title: 'yarn',
-      subtitle: '锁文件一致性更强',
-      strengths: ['安装速度改善', '锁文件成熟'],
-      caveats: ['团队混用成本高'],
-      backendComparison: '类似 Gradle 在效率上的增强。'
+      subtitle: '工程化增强：v1 node_modules，Berry 支持 PnP/约束',
+      strengths: ['工作区与约束能力强，适合治理型团队', 'Berry 可通过 PnP 提升解析一致性', '零安装（Zero-Install）方案成熟'],
+      caveats: ['v1 与 Berry 心智差异大', 'PnP 对部分旧工具链有兼容成本'],
+      backendComparison: '类似高度可定制的 Gradle：治理能力强，但团队规范要求更高。'
     },
     {
       id: 'pnpm',
       title: 'pnpm（推荐）',
-      subtitle: '高复用 + 严格隔离',
-      strengths: ['磁盘占用低', '依赖边界清晰'],
-      caveats: ['老项目迁移需适配'],
-      backendComparison: '类似本地仓库复用策略。'
+      subtitle: '内容寻址存储 + 硬链接/符号链接 + 严格依赖边界',
+      strengths: ['全局 store 复用率高，安装快且省磁盘', '默认更严格，能提前暴露幽灵依赖', 'Monorepo workspace 体验与性能稳定'],
+      caveats: ['依赖 node_modules 扁平假设的旧脚本可能需改造', '从 npm/yarn 迁移时需一次性清理历史依赖习惯'],
+      backendComparison: '类似“本地仓库缓存 + 类路径隔离”并行优化：兼顾复用与边界。'
     }
   ],
   ideCards: [
@@ -280,9 +309,9 @@ const Dashboard = defineAsyncComponent(() => import('./Dashboard.vue'))`
       { path: 'src/main.ts', group: 'entry', description: '应用入口。' },
       { path: 'src/router/index.ts', group: 'router', description: '路由映射。' },
       { path: 'src/data/chapters.ts', group: 'data', description: '章节目录数据。' },
-      { path: 'src/data/chapter1.ts', group: 'data', description: '第三章 UI 内容数据。' },
-      { path: 'src/data/chapter2.ts', group: 'data', description: '第一章 States 内容数据。' },
-      { path: 'src/data/chapter3.ts', group: 'data', description: '第二章 f() 内容数据。' },
+      { path: 'src/data/chapter1.ts', group: 'data', description: '第一章 States 内容数据。' },
+      { path: 'src/data/chapter2.ts', group: 'data', description: '第二章 f() 内容数据。' },
+      { path: 'src/data/chapter3.ts', group: 'data', description: '第三章 UI 内容数据。' },
       { path: 'src/data/chapter4.ts', group: 'data', description: '第四章实践内容数据。' },
       { path: 'src/data/chapter5.ts', group: 'data', description: '第五章渲染策略内容数据。' },
       { path: 'src/data/chapter6.ts', group: 'data', description: '第六章工程化内容数据。' },

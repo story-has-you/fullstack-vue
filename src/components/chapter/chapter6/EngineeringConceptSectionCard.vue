@@ -111,6 +111,10 @@ const formatTreeLine = (rawTree: string, description: string, commentColumn: num
 }
 
 const projectTreeLines = computed<ProjectTreeLine[]>(() => {
+  if (!showProjectStructure.value) {
+    return []
+  }
+
   const dirDescriptionMap = new Map(
     props.projectStructure.directories.map((item) => [item.path, item.description])
   )
@@ -265,7 +269,12 @@ const projectTreeLines = computed<ProjectTreeLine[]>(() => {
   }))
 })
 
-const projectTreeOutput = computed(() => projectTreeLines.value.map((line) => line.displayLine).join('\n'))
+const projectTreeOutput = computed(() => {
+  if (!showProjectStructure.value) {
+    return ''
+  }
+  return projectTreeLines.value.map((line) => line.displayLine).join('\n')
+})
 </script>
 
 <template>

@@ -15,6 +15,36 @@ const codeRef = ref<HTMLElement | null>(null)
 const isCopied = ref(false)
 let copyTimer: ReturnType<typeof setTimeout> | null = null
 
+const loadHighlightCore = async () => (await import('highlight.js/lib/core')).default
+
+type HighlightCore = Awaited<ReturnType<typeof loadHighlightCore>>
+
+let highlightInitPromise: Promise<HighlightCore> | null = null
+
+const ensureHighlightInitialized = async (): Promise<HighlightCore> => {
+  if (!highlightInitPromise) {
+    highlightInitPromise = Promise.all([
+      loadHighlightCore(),
+      import('highlight.js/lib/languages/javascript'),
+      import('highlight.js/lib/languages/typescript'),
+      import('highlight.js/lib/languages/xml')
+    ]).then(([hljs, { default: javascript }, { default: typescript }, { default: xml }]) => {
+      if (!hljs.getLanguage('javascript')) {
+        hljs.registerLanguage('javascript', javascript)
+      }
+      if (!hljs.getLanguage('typescript')) {
+        hljs.registerLanguage('typescript', typescript)
+      }
+      if (!hljs.getLanguage('xml')) {
+        hljs.registerLanguage('xml', xml)
+      }
+      return hljs
+    })
+  }
+
+  return highlightInitPromise
+}
+
 const normalizedLanguage = computed(() => {
   if (props.language === 'vue') {
     return 'xml'
@@ -53,17 +83,7 @@ const copyButtonClass = computed(() => {
 })
 
 const highlightCode = async () => {
-  const [{ default: hljs }, { default: javascript }, { default: typescript }, { default: xml }] =
-    await Promise.all([
-      import('highlight.js/lib/core'),
-      import('highlight.js/lib/languages/javascript'),
-      import('highlight.js/lib/languages/typescript'),
-      import('highlight.js/lib/languages/xml')
-    ])
-
-  hljs.registerLanguage('javascript', javascript)
-  hljs.registerLanguage('typescript', typescript)
-  hljs.registerLanguage('xml', xml)
+  const hljs = await ensureHighlightInitialized()
 
   if (codeRef.value) {
     hljs.highlightElement(codeRef.value)
