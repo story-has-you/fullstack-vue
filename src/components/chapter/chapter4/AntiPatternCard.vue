@@ -21,7 +21,7 @@
     <!-- 错误做法 -->
     <div class="mt-3">
       <div class="flex items-center gap-2">
-        <span class="text-lg">❌</span>
+        <span class="inline-flex h-2 w-2 rounded-full bg-rose-500" />
         <p class="text-xs font-semibold text-slate-700">错误做法</p>
       </div>
       <div :class="['mt-2 rounded-lg p-3', colors.codeBg]">
@@ -32,7 +32,7 @@
     <!-- 正确做法 -->
     <div class="mt-3">
       <div class="flex items-center gap-2">
-        <span class="text-lg">✅</span>
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
         <p class="text-xs font-semibold text-slate-700">正确做法</p>
       </div>
       <div class="mt-2 rounded-lg bg-emerald-50 p-3">

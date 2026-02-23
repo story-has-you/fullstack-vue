@@ -20,6 +20,7 @@ const navigateToChapter = (route: string) => {
  */
 const introChapter = chapters.find(c => c.id === 'intro')
 const mainChapters = chapters.filter(c => c.number >= 1 && c.number <= 6)
+const epilogueChapter = chapters.find(c => c.id === 'epilogue')
 const firstMainChapter = mainChapters[0]
 
 const heroFacts = [
@@ -41,21 +42,21 @@ const learningPaths: LearningPath[] = [
     id: 'basic',
     title: '基础篇',
     range: '前言 + 第 1-3 章',
-    detail: '建立声明式 UI 与组件化认知',
+    detail: '建立 States → f() → UI 的核心主线',
     icon: 'basicPath'
   },
   {
     id: 'advanced',
     title: '进阶篇',
     range: '第 4-6 章',
-    detail: '掌握状态管理与工程化体系',
+    detail: '完成项目实践、渲染策略与工程化体系',
     icon: 'advancedPath'
   },
   {
     id: 'architecture',
-    title: '架构篇',
-    range: '第 6 章',
-    detail: '完成全栈思维与工程化闭环',
+    title: '闭环篇',
+    range: '结语',
+    detail: '固化跨团队协作范式',
     icon: 'architecturePath'
   }
 ]
@@ -144,6 +145,20 @@ const learningPaths: LearningPath[] = [
             :key="chapter.id"
             :chapter="chapter"
             @click="navigateToChapter(chapter.route)"
+          />
+        </div>
+      </section>
+
+      <section v-if="epilogueChapter" class="mb-12">
+        <h2 class="section-title">
+          <component :is="homeIconMap.epilogue" class="h-6 w-6 text-sky-600" />
+          结语
+        </h2>
+        <p class="mb-6 text-center text-sm text-slate-500">收束到可落地的全栈协作模型。</p>
+        <div class="max-w-2xl mx-auto">
+          <ChapterCard
+            :chapter="epilogueChapter"
+            @click="navigateToChapter(epilogueChapter.route)"
           />
         </div>
       </section>

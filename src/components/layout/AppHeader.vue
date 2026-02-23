@@ -52,6 +52,13 @@ const navigateTo = (path: string) => {
             <BookOpen class="h-4 w-4" />
             前言
           </button>
+          <button
+            @click="navigateTo('/epilogue')"
+            class="inline-flex items-center gap-2 font-medium text-gray-700 transition-colors hover:text-sky-600"
+          >
+            <BookOpen class="h-4 w-4" />
+            结语
+          </button>
           <div class="relative group">
             <button class="font-medium text-gray-700 transition-colors hover:text-sky-600">
               章节
@@ -98,6 +105,12 @@ const navigateTo = (path: string) => {
             class="rounded-lg px-4 py-2 text-left text-gray-700 transition-colors hover:bg-sky-50 hover:text-sky-700"
           >
             前言
+          </button>
+          <button
+            @click="navigateTo('/epilogue')"
+            class="rounded-lg px-4 py-2 text-left text-gray-700 transition-colors hover:bg-sky-50 hover:text-sky-700"
+          >
+            结语
           </button>
           <div class="px-4 py-2 text-sm font-semibold text-gray-500">章节</div>
           <button

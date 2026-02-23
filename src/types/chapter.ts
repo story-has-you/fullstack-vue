@@ -9,6 +9,36 @@ export interface Section {
 }
 
 /**
+ * 公式聚焦点：说明本章在 UI = f(States) 中的位置
+ */
+export interface FormulaFocus {
+  role: string
+  keyQuestion: string
+  takeaways: string[]
+}
+
+/**
+ * 前后端职责边界
+ */
+export interface ResponsibilityBoundary {
+  frontend: string[]
+  backend: string[]
+  contract: string[]
+}
+
+/**
+ * 项目案例卡片
+ */
+export interface ProjectCase {
+  id: string
+  title: string
+  scenario: string
+  frontendActions: string[]
+  backendActions: string[]
+  boundaryNotes: string[]
+}
+
+/**
  * 章节接口
  */
 export interface Chapter {

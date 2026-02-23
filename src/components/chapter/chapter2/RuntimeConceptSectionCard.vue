@@ -2,11 +2,8 @@
 import { computed } from 'vue'
 import type { Chapter2ConceptSection } from '@/data/chapter2'
 import CodeSnippetPanel from '@/components/chapter/chapter2/CodeSnippetPanel.vue'
-import EventLoopTimelineDiagram from '@/components/chapter/chapter2/EventLoopTimelineDiagram.vue'
 import StateBasicDemo from '@/components/chapter/chapter2/StateBasicDemo.vue'
 import StateClassificationDemo from '@/components/chapter/chapter2/StateClassificationDemo.vue'
-import PropDrillingDemo from '@/components/chapter/chapter2/PropDrillingDemo.vue'
-import AsyncStateMachine from '@/components/chapter/chapter2/AsyncStateMachine.vue'
 
 interface Props {
   section: Chapter2ConceptSection
@@ -17,8 +14,6 @@ const props = defineProps<Props>()
 const codeGridClass = computed(() =>
   props.section.codeSamples.length > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'
 )
-
-const showEventLoopDiagram = computed(() => props.section.id === '2.1')
 </script>
 
 <template>
@@ -81,12 +76,8 @@ const showEventLoopDiagram = computed(() => props.section.id === '2.1')
       </ul>
     </section>
 
-    <EventLoopTimelineDiagram v-if="showEventLoopDiagram" />
-
     <StateBasicDemo v-if="section.demoComponent === 'StateBasicDemo'" />
     <StateClassificationDemo v-if="section.demoComponent === 'StateClassificationDemo'" />
-    <PropDrillingDemo v-if="section.demoComponent === 'PropDrillingDemo'" />
-    <AsyncStateMachine v-if="section.demoComponent === 'AsyncStateMachine'" />
 
     <section class="mt-6 grid grid-cols-1 gap-4" :class="codeGridClass">
       <CodeSnippetPanel

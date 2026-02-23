@@ -1,3 +1,5 @@
+import type { ProjectCase, ResponsibilityBoundary } from '@/types/chapter'
+
 export interface Chapter1CodeSample {
   id: string
   title: string
@@ -30,18 +32,43 @@ export interface Chapter1Content {
   pageTitle: string
   pageSubtitle: string
   chapterSummary: string
-  formulaRelation?: string
+  formulaRelation: string
+  responsibilityBoundary: ResponsibilityBoundary
+  projectCases: ProjectCase[]
   conceptSections: Chapter1ConceptSection[]
   exampleSections: Chapter1ExampleSection[]
 }
 
 export const chapter1Content: Chapter1Content = {
-  pageTitle: '第一章：UI (用户界面层)',
+  pageTitle: '第三章：UI (用户界面层)',
   pageSubtitle: 'User Interface Layer',
   chapterSummary:
     '本章只讲 UI 层：怎么用声明式写法描述界面、怎么用组件拆分页面、以及虚拟 DOM 如何高效更新。目标是用“看状态写界面”替代手动改 DOM。',
   formulaRelation:
     '在 UI = f(States) 中，第一章关注左侧的 UI。你负责描述“状态对应什么界面”，框架负责计算和更新。声明式 UI 管表达，组件化管组织，虚拟 DOM 管高效落地。',
+  responsibilityBoundary: {
+    frontend: ['定义组件结构与交互反馈', '基于状态分支渲染加载态/空态/权限态', '通过事件上抛触发业务命令'],
+    backend: ['提供稳定 DTO 字段和权限语义', '确保接口错误码可区分业务场景', '保证字段兼容和版本演进'],
+    contract: ['约定字段可空性与默认值', '约定列表项唯一标识 id', '约定命令接口副作用与幂等性']
+  },
+  projectCases: [
+    {
+      id: 'ui-card-render',
+      title: '案例：章节卡片渲染',
+      scenario: '首页通过章节元数据渲染卡片，保持 UI 幂等输出。',
+      frontendActions: ['基于 Chapter 对象渲染 ChapterCard', '使用稳定 key 保证节点复用正确', '点击卡片仅发出导航意图'],
+      backendActions: ['保障章节字段结构稳定', '提供可扩展图标与颜色枚举'],
+      boundaryNotes: ['UI 结构归前端，业务真相归状态', '后端不关心样式细节，前端不拼业务规则']
+    },
+    {
+      id: 'ui-permission-button',
+      title: '案例：权限按钮分支',
+      scenario: 'Delete 按钮根据 role 与 loading 状态切换。',
+      frontendActions: ['计算 canDelete 派生状态', '模板声明三种分支', '通过 emit 上抛 delete-user 命令'],
+      backendActions: ['返回准确角色信息', '删除接口执行权限校验'],
+      boundaryNotes: ['权限判定展示在前端，权限裁决必须在后端']
+    }
+  ],
   conceptSections: [
     {
       id: '1.1',
@@ -252,102 +279,5 @@ const handleEdit = (userId: number) => {
       ]
     }
   ],
-  exampleSections: [
-    {
-      id: '1.4',
-      title: '最小示例 1：声明式 UI + 单向命令事件',
-      scenario: '后端同学常见写法是手动操作 DOM。状态一多，UI 与数据容易分裂。',
-      codeSample: {
-        id: '1.4-example',
-        title: 'DeclarativePermissionButton.vue',
-        language: 'vue',
-        tone: 'neutral',
-        code: `<script setup lang="ts">
-import { computed } from 'vue'
-
-interface UserDTO {
-  id: number
-  name: string
-  role: 'ADMIN' | 'USER'
-}
-
-const props = defineProps<{
-  user: UserDTO
-  isLoading: boolean
-}>()
-
-const emit = defineEmits<{
-  (e: 'delete-user', userId: number): void
-}>()
-
-const canDelete = computed(() => !props.isLoading && props.user.role === 'ADMIN')
-</script>
-
-<template>
-  <div v-if="isLoading">Loading...</div>
-  <button v-else-if="canDelete" @click="emit('delete-user', user.id)">
-    Delete User
-  </button>
-  <span v-else>No Permission</span>
-</template>`
-      },
-      runGuide:
-        '将组件挂到任意页面并传入 user、isLoading，监听 delete-user 事件即可验证声明式状态分支与单向命令上抛。',
-      antiPatterns: [
-        '在 template 中直接调用副作用函数。',
-        '在组件内部使用 querySelector 手动修改 DOM。'
-      ]
-    },
-    {
-      id: '1.5',
-      title: '最小示例 2：列表渲染的 key 策略',
-      scenario: '列表数据发生插入、删除、排序时，如何保证组件实例不被错误复用。',
-      codeSample: {
-        id: '1.5-example',
-        title: 'TaskList.vue',
-        language: 'vue',
-        tone: 'neutral',
-        code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-interface Task {
-  id: string
-  title: string
-  completed: boolean
-}
-
-const tasks = ref<Task[]>([
-  { id: 'a', title: 'Task A', completed: false },
-  { id: 'b', title: 'Task B', completed: false },
-  { id: 'c', title: 'Task C', completed: false }
-])
-
-const shuffle = () => {
-  tasks.value = [...tasks.value].sort(() => Math.random() - 0.5)
-}
-
-const toggle = (id: string) => {
-  const task = tasks.value.find(t => t.id === id)
-  if (task) task.completed = !task.completed
-}
-</script>
-
-<template>
-  <button @click="shuffle">Shuffle</button>
-  <ul>
-    <li v-for="task in tasks" :key="task.id">
-      <input type="checkbox" :checked="task.completed" @change="toggle(task.id)" />
-      {{ task.title }}
-    </li>
-  </ul>
-</template>`
-      },
-      runGuide: '将组件挂到任意页面,点击 Shuffle 打乱顺序,观察复选框状态是否跟随正确的任务项。如果用 index 作为 key,状态会错位。',
-      antiPatterns: [
-        '使用 index 作为 key,导致排序时状态错位。',
-        '使用不稳定的随机值作为 key,每次渲染都重建组件。',
-        '在列表项中使用副作用但不提供 key,导致复用逻辑混乱。'
-      ]
-    }
-  ]
+  exampleSections: []
 }

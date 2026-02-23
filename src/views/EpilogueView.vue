@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import EngineeringConceptSectionCard from '@/components/chapter/chapter6/EngineeringConceptSectionCard.vue'
 import FormulaRelationPanel from '@/components/common/FormulaRelationPanel.vue'
-import { chapter6Content } from '@/data/chapter6'
+import { epilogueContent } from '@/data/epilogue'
 </script>
 
 <template>
@@ -12,30 +11,26 @@ import { chapter6Content } from '@/data/chapter6'
     <div class="container relative z-10 mx-auto px-4 py-10 md:py-14">
       <section class="glass-panel mb-10 rounded-3xl border border-sky-100 p-8 md:p-12">
         <div class="mb-4 inline-flex items-center rounded-full border border-sky-200 bg-sky-50/80 px-4 py-2 text-sm font-semibold text-sky-700">
-          Core Chapter
+          Epilogue
         </div>
         <h1 class="text-3xl font-bold tracking-tight text-slate-900 md:text-5xl">
-          {{ chapter6Content.pageTitle }}
+          {{ epilogueContent.pageTitle }}
         </h1>
         <p class="mt-2 text-base font-medium text-slate-500 md:text-lg">
-          {{ chapter6Content.pageSubtitle }}
+          {{ epilogueContent.pageSubtitle }}
         </p>
         <p class="mt-6 max-w-4xl text-base leading-relaxed text-slate-700 md:text-lg">
-          {{ chapter6Content.chapterSummary }}
+          {{ epilogueContent.summary }}
         </p>
       </section>
 
-      <FormulaRelationPanel :relation="chapter6Content.formulaRelation" />
+      <FormulaRelationPanel :relation="epilogueContent.formulaRelation" />
 
-      <section class="space-y-8">
-        <EngineeringConceptSectionCard
-          v-for="section in chapter6Content.conceptSections"
-          :key="section.id"
-          :section="section"
-          :package-manager-cards="chapter6Content.packageManagerCards"
-          :ide-cards="chapter6Content.ideCards"
-          :project-structure="chapter6Content.projectStructure"
-        />
+      <section class="rounded-3xl border border-sky-100 bg-white/90 p-6">
+        <h2 class="text-xl font-bold text-slate-900">后续行动建议</h2>
+        <ul class="mt-4 space-y-2 text-sm text-slate-700">
+          <li v-for="item in epilogueContent.nextSteps" :key="item">- {{ item }}</li>
+        </ul>
       </section>
     </div>
   </div>

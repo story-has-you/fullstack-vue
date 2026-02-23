@@ -53,7 +53,7 @@ const getResultInfo = () => {
         title: 'Global State（全局状态）',
         icon: '🎨',
         color: 'sky',
-        description: '使用 Pinia Store 或 Provide/Inject 跨组件共享',
+        description: '使用 Pinia Store 跨组件共享',
         examples: ['当前登录用户 currentUser', '应用主题 themeMode', '购物车内容 cartItems'],
         code: 'const userStore = useUserStore()'
       }

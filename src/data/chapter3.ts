@@ -1,3 +1,5 @@
+import type { ProjectCase, ResponsibilityBoundary } from '@/types/chapter'
+
 export interface Chapter3CodeSample {
   id: string
   title: string
@@ -21,17 +23,42 @@ export interface Chapter3Content {
   pageTitle: string
   pageSubtitle: string
   chapterSummary: string
-  formulaRelation?: string
+  formulaRelation: string
+  responsibilityBoundary: ResponsibilityBoundary
+  projectCases: ProjectCase[]
   conceptSections: Chapter3ConceptSection[]
 }
 
 export const chapter3Content: Chapter3Content = {
-  pageTitle: '第三章：f() - 响应式绑定机制',
+  pageTitle: '第二章：f() - 响应式绑定机制',
   pageSubtitle: 'Reactive Binding Mechanism',
   chapterSummary:
     '本章讲 UI = f(States) 里的 f()：状态变了，界面为什么会自动更新。会用通俗方式讲清 Proxy、依赖收集、调度、v-model 和副作用管理。',
   formulaRelation:
     '可以把 f() 理解成“把状态翻译成界面”的函数。状态变化后，Proxy 先感知变更，依赖收集找到受影响组件，调度器合并更新任务，再重算并更新 UI。',
+  responsibilityBoundary: {
+    frontend: ['实现状态到 UI 的映射函数', '保持单向数据流和副作用隔离', '处理渲染调度与组件生命周期'],
+    backend: ['保持 API 语义稳定，减少前端映射分支', '提供可预测字段和值域', '明确幂等接口与事务边界'],
+    contract: ['字段命名与类型一致', '错误模型统一', '时间字段与时区语义明确']
+  },
+  projectCases: [
+    {
+      id: 'reactive-pipeline',
+      title: '案例：复制按钮更新链路',
+      scenario: '点击复制后按钮文案从“复制代码”切换为“已复制”。',
+      frontendActions: ['修改 copied 状态', '调度组件重渲染', '定时恢复状态并清理副作用'],
+      backendActions: ['无直接参与，保持纯前端交互', '如接埋点则提供轻量上报接口'],
+      boundaryNotes: ['UI 反馈链路在前端闭环', '业务审计与追踪可由后端接收事件']
+    },
+    {
+      id: 'props-emits-boundary',
+      title: '案例：Props 下行 / Emits 上行',
+      scenario: '子组件不直接改父状态，只通过事件上抛命令。',
+      frontendActions: ['props 只读', 'emit 事件触发父组件写状态'],
+      backendActions: ['命令接口执行业务校验与持久化'],
+      boundaryNotes: ['前端负责交互流', '后端负责最终业务真相']
+    }
+  ],
   conceptSections: [
     {
       id: '3.1',

@@ -20,7 +20,7 @@ const codeGridClass = computed(() =>
 )
 
 const showRenderModeCards = computed(() => props.section.id === '5.1')
-const showSelectionStrategies = computed(() => props.section.id === '5.3')
+const showSelectionStrategies = computed(() => props.section.id === '5.4')
 
 const renderModeColorClassMap: Record<Chapter5RenderModeCard['id'], string> = {
   csr: 'border-sky-100 bg-sky-50/70',
@@ -103,7 +103,7 @@ const getStrategyDotClass = (id: Chapter5SelectionStrategy['id']) => strategyDot
     </section>
 
     <section v-if="showRenderModeCards" class="mt-4">
-      <h3 class="mb-3 text-base font-semibold text-slate-900">渲染模式三视角</h3>
+      <h3 class="mb-3 text-base font-semibold text-slate-900">CSR / SSR 对比视角</h3>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <article
           v-for="card in renderModeCards"
@@ -113,8 +113,19 @@ const getStrategyDotClass = (id: Chapter5SelectionStrategy['id']) => strategyDot
         >
           <h4 class="text-base font-semibold" :class="getRenderModeTitleClass(card.id)">{{ card.title }}</h4>
           <p class="mt-1 text-xs font-medium text-slate-600">{{ card.subtitle }}</p>
-          <p class="mt-3 text-sm leading-relaxed text-slate-700">{{ card.definition }}</p>
-          <p class="mt-3 text-xs leading-relaxed text-slate-600">{{ card.backendComparison }}</p>
+          <p class="mt-3 text-xs leading-relaxed text-slate-700">
+            <span class="font-semibold">执行时机：</span>{{ card.executionTiming }}
+          </p>
+          <p class="mt-1 text-xs leading-relaxed text-slate-700">
+            <span class="font-semibold">执行位置：</span>{{ card.executionLocation }}
+          </p>
+          <p class="mt-1 text-xs leading-relaxed text-slate-700">
+            <span class="font-semibold">公式映射：</span>{{ card.formulaMapping }}
+          </p>
+          <p v-if="card.definition" class="mt-2 text-xs leading-relaxed text-slate-600">{{ card.definition }}</p>
+          <p v-if="card.backendComparison" class="mt-1 text-xs leading-relaxed text-slate-600">
+            {{ card.backendComparison }}
+          </p>
 
           <div class="mt-3 border-t border-white/80 pt-3">
             <p class="text-xs font-semibold text-slate-500">优势</p>

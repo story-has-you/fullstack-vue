@@ -123,6 +123,37 @@ onBeforeUnmount(() => {
       </section>
 
       <section class="glass-panel mb-12 rounded-3xl border border-sky-100 p-8 md:p-10">
+        <div
+          v-if="introContent.formulaRationale"
+          class="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-6"
+        >
+          <h2 class="text-xl font-bold text-emerald-900">{{ introContent.formulaRationale.title }}</h2>
+          <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <article class="rounded-xl border border-emerald-100 bg-white/90 p-4">
+              <p class="text-sm font-semibold text-emerald-900">为什么是公式</p>
+              <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                <li v-for="item in introContent.formulaRationale.why" :key="item">- {{ item }}</li>
+              </ul>
+            </article>
+            <article class="rounded-xl border border-cyan-100 bg-white/90 p-4">
+              <p class="text-sm font-semibold text-cyan-900">后端类比</p>
+              <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                <li v-for="item in introContent.formulaRationale.backendAnalogy" :key="item">
+                  - {{ item }}
+                </li>
+              </ul>
+            </article>
+            <article class="rounded-xl border border-violet-100 bg-white/90 p-4">
+              <p class="text-sm font-semibold text-violet-900">工程含义</p>
+              <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                <li v-for="item in introContent.formulaRationale.implications" :key="item">
+                  - {{ item }}
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+
         <h2 class="section-title">前端核心三要素</h2>
         <p class="mb-6 text-center text-sm text-slate-500">三要素静态展示，便于连续阅读与对比。</p>
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">

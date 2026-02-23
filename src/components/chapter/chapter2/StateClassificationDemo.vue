@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, provide } from 'vue'
+import { ref } from 'vue'
 
 /**
  * 状态分类演示组件
@@ -13,9 +13,7 @@ const togglePanel = () => {
 }
 
 // Global State 示例：主题模式（跨组件共享）
-// 使用 provide/inject 模拟全局状态
 const theme = ref<'light' | 'dark'>('light')
-provide('theme', theme)
 
 const toggleTheme = () => {
   theme.value = theme.value === 'light' ? 'dark' : 'light'

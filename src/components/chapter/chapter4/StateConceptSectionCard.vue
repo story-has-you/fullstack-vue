@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Chapter4ConceptSection, Chapter4Pattern, Chapter4TaxonomyCard } from '@/data/chapter4'
+import type {
+  Chapter4AntiPattern,
+  Chapter4BestPractice,
+  Chapter4ConceptSection,
+  Chapter4EvidenceLink,
+  Chapter4StatePatternCard,
+  Chapter4StateTaxonomyCard
+} from '@/data/chapter4'
+import AntiPatternCard from '@/components/chapter/chapter4/AntiPatternCard.vue'
 import CodeSnippetPanel from '@/components/chapter/chapter4/CodeSnippetPanel.vue'
 
 interface Props {
   section: Chapter4ConceptSection
-  taxonomyCards: Chapter4TaxonomyCard[]
-  patterns: Chapter4Pattern[]
+  stateTaxonomyCards: Chapter4StateTaxonomyCard[]
+  statePatternCards: Chapter4StatePatternCard[]
+  antiPatterns: Chapter4AntiPattern[]
+  bestPractices: Chapter4BestPractice[]
 }
 
 const props = defineProps<Props>()
@@ -15,49 +25,70 @@ const codeGridClass = computed(() =>
   props.section.codeSamples.length > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'
 )
 
-const showTaxonomyCards = computed(() => props.section.id === '4.1')
-const showPatterns = computed(() => props.section.id === '4.2')
+const getEvidenceIds = (kind: Chapter4EvidenceLink['kind']) =>
+  props.section.evidenceLinks.find((link) => link.kind === kind)?.ids ?? []
 
-const taxonomyColorClassMap: Record<Chapter4TaxonomyCard['id'], string> = {
+const pickByIds = <T extends { id: string }>(list: T[], ids: string[]): T[] => {
+  const idSet = new Set(ids)
+  return list.filter((item) => idSet.has(item.id))
+}
+
+const visibleStateTaxonomyCards = computed(() =>
+  pickByIds(props.stateTaxonomyCards, getEvidenceIds('state-taxonomy'))
+)
+
+const visibleStatePatternCards = computed(() =>
+  pickByIds(props.statePatternCards, getEvidenceIds('state-pattern'))
+)
+
+const visibleAntiPatterns = computed(() =>
+  pickByIds(props.antiPatterns, getEvidenceIds('anti-pattern'))
+)
+
+const visibleBestPractices = computed(() =>
+  pickByIds(props.bestPractices, getEvidenceIds('best-practice'))
+)
+
+const taxonomyColorClassMap: Record<Chapter4StateTaxonomyCard['id'], string> = {
   local: 'border-sky-100 bg-sky-50/70',
   global: 'border-indigo-100 bg-indigo-50/70',
   remote: 'border-emerald-100 bg-emerald-50/70'
 }
 
-const taxonomyTitleClassMap: Record<Chapter4TaxonomyCard['id'], string> = {
+const taxonomyTitleClassMap: Record<Chapter4StateTaxonomyCard['id'], string> = {
   local: 'text-sky-900',
   global: 'text-indigo-900',
   remote: 'text-emerald-900'
 }
 
-const taxonomyDotClassMap: Record<Chapter4TaxonomyCard['id'], string> = {
+const taxonomyDotClassMap: Record<Chapter4StateTaxonomyCard['id'], string> = {
   local: 'bg-sky-500',
   global: 'bg-indigo-500',
   remote: 'bg-emerald-500'
 }
 
-const patternColorClassMap: Record<Chapter4Pattern['id'], string> = {
+const patternColorClassMap: Record<Chapter4StatePatternCard['id'], string> = {
   'provide-inject': 'border-cyan-100 bg-cyan-50/70',
   'global-store': 'border-amber-100 bg-amber-50/70'
 }
 
-const patternTitleClassMap: Record<Chapter4Pattern['id'], string> = {
+const patternTitleClassMap: Record<Chapter4StatePatternCard['id'], string> = {
   'provide-inject': 'text-cyan-900',
   'global-store': 'text-amber-900'
 }
 
-const patternDotClassMap: Record<Chapter4Pattern['id'], string> = {
+const patternDotClassMap: Record<Chapter4StatePatternCard['id'], string> = {
   'provide-inject': 'bg-cyan-500',
   'global-store': 'bg-amber-500'
 }
 
-const getTaxonomyColorClass = (id: Chapter4TaxonomyCard['id']) => taxonomyColorClassMap[id]
-const getTaxonomyTitleClass = (id: Chapter4TaxonomyCard['id']) => taxonomyTitleClassMap[id]
-const getTaxonomyDotClass = (id: Chapter4TaxonomyCard['id']) => taxonomyDotClassMap[id]
+const getTaxonomyColorClass = (id: Chapter4StateTaxonomyCard['id']) => taxonomyColorClassMap[id]
+const getTaxonomyTitleClass = (id: Chapter4StateTaxonomyCard['id']) => taxonomyTitleClassMap[id]
+const getTaxonomyDotClass = (id: Chapter4StateTaxonomyCard['id']) => taxonomyDotClassMap[id]
 
-const getPatternColorClass = (id: Chapter4Pattern['id']) => patternColorClassMap[id]
-const getPatternTitleClass = (id: Chapter4Pattern['id']) => patternTitleClassMap[id]
-const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
+const getPatternColorClass = (id: Chapter4StatePatternCard['id']) => patternColorClassMap[id]
+const getPatternTitleClass = (id: Chapter4StatePatternCard['id']) => patternTitleClassMap[id]
+const getPatternDotClass = (id: Chapter4StatePatternCard['id']) => patternDotClassMap[id]
 </script>
 
 <template>
@@ -110,11 +141,11 @@ const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
       </ul>
     </section>
 
-    <section v-if="showTaxonomyCards" class="mt-4">
-      <h3 class="mb-3 text-base font-semibold text-slate-900">三类状态分层</h3>
+    <section v-if="visibleStateTaxonomyCards.length" class="mt-4">
+      <h3 class="mb-3 text-base font-semibold text-slate-900">证据面板：状态分层</h3>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <article
-          v-for="card in taxonomyCards"
+          v-for="card in visibleStateTaxonomyCards"
           :key="card.id"
           class="rounded-2xl border p-4"
           :class="getTaxonomyColorClass(card.id)"
@@ -123,16 +154,6 @@ const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
           <p class="mt-1 text-xs font-medium text-slate-600">{{ card.subtitle }}</p>
           <p class="mt-3 text-sm leading-relaxed text-slate-700">{{ card.definition }}</p>
           <p class="mt-3 text-xs leading-relaxed text-slate-600">{{ card.backendComparison }}</p>
-
-          <div class="mt-3 border-t border-white/80 pt-3">
-            <p class="text-xs font-semibold text-slate-500">典型示例</p>
-            <ul class="mt-2 space-y-1 text-sm text-slate-700">
-              <li v-for="item in card.examples" :key="item" class="flex items-start gap-2">
-                <span class="mt-2 h-1.5 w-1.5 rounded-full" :class="getTaxonomyDotClass(card.id)" />
-                <span>{{ item }}</span>
-              </li>
-            </ul>
-          </div>
 
           <div class="mt-3 border-t border-white/80 pt-3">
             <p class="text-xs font-semibold text-slate-500">实现建议</p>
@@ -147,11 +168,11 @@ const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
       </div>
     </section>
 
-    <section v-if="showPatterns" class="mt-4">
-      <h3 class="mb-3 text-base font-semibold text-slate-900">实现模式对比</h3>
+    <section v-if="visibleStatePatternCards.length" class="mt-4">
+      <h3 class="mb-3 text-base font-semibold text-slate-900">证据面板：实现模式</h3>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <article
-          v-for="pattern in patterns"
+          v-for="pattern in visibleStatePatternCards"
           :key="pattern.id"
           class="rounded-2xl border p-4"
           :class="getPatternColorClass(pattern.id)"
@@ -163,11 +184,7 @@ const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
           <div class="mt-3 border-t border-white/80 pt-3">
             <p class="text-xs font-semibold text-slate-500">适用场景</p>
             <ul class="mt-2 space-y-1 text-sm text-slate-700">
-              <li
-                v-for="item in pattern.suitableScenarios"
-                :key="item"
-                class="flex items-start gap-2"
-              >
+              <li v-for="item in pattern.suitableScenarios" :key="item" class="flex items-start gap-2">
                 <span class="mt-2 h-1.5 w-1.5 rounded-full" :class="getPatternDotClass(pattern.id)" />
                 <span>{{ item }}</span>
               </li>
@@ -175,7 +192,7 @@ const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
           </div>
 
           <div class="mt-3 border-t border-white/80 pt-3">
-            <p class="text-xs font-semibold text-slate-500">权衡与约束</p>
+            <p class="text-xs font-semibold text-slate-500">权衡</p>
             <ul class="mt-2 space-y-1 text-sm text-slate-700">
               <li v-for="item in pattern.tradeoffs" :key="item" class="flex items-start gap-2">
                 <span class="mt-2 h-1.5 w-1.5 rounded-full" :class="getPatternDotClass(pattern.id)" />
@@ -183,14 +200,41 @@ const getPatternDotClass = (id: Chapter4Pattern['id']) => patternDotClassMap[id]
               </li>
             </ul>
           </div>
+        </article>
+      </div>
+    </section>
 
-          <div class="mt-3 border-t border-white/80 pt-3">
-            <p class="text-xs font-semibold text-slate-500">落地建议</p>
-            <ul class="mt-2 space-y-1 text-sm text-slate-700">
-              <li v-for="item in pattern.implementationTips" :key="item" class="flex items-start gap-2">
-                <span class="mt-2 h-1.5 w-1.5 rounded-full" :class="getPatternDotClass(pattern.id)" />
-                <span>{{ item }}</span>
-              </li>
+    <section v-if="visibleAntiPatterns.length" class="mt-4 rounded-2xl border border-rose-100 bg-rose-50/40 p-4">
+      <h3 class="mb-3 text-base font-semibold text-rose-900">证据面板：反模式</h3>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <AntiPatternCard
+          v-for="item in visibleAntiPatterns"
+          :key="item.id"
+          :anti-pattern="item"
+        />
+      </div>
+    </section>
+
+    <section v-if="visibleBestPractices.length" class="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4">
+      <h3 class="mb-3 text-base font-semibold text-emerald-900">证据面板：最佳实践</h3>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <article
+          v-for="item in visibleBestPractices"
+          :key="item.id"
+          class="rounded-xl border border-emerald-200 bg-white/90 p-4"
+        >
+          <h4 class="text-sm font-semibold text-emerald-900">{{ item.title }}</h4>
+          <p class="mt-2 text-sm leading-relaxed text-slate-700">{{ item.principle }}</p>
+          <div class="mt-3">
+            <p class="text-xs font-semibold text-slate-600">实现建议</p>
+            <ul class="mt-1 space-y-1 text-sm text-slate-700">
+              <li v-for="tip in item.implementation" :key="tip">- {{ tip }}</li>
+            </ul>
+          </div>
+          <div class="mt-3">
+            <p class="text-xs font-semibold text-slate-600">收益</p>
+            <ul class="mt-1 space-y-1 text-sm text-slate-700">
+              <li v-for="benefit in item.benefits" :key="benefit">- {{ benefit }}</li>
             </ul>
           </div>
         </article>
