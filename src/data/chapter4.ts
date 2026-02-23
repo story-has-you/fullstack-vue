@@ -1,29 +1,9 @@
-import type { ResponsibilityBoundary } from '@/types/chapter'
-
 export interface Chapter4CodeSample {
   id: string
   title: string
   language: 'javascript' | 'typescript' | 'vue'
   code: string
   tone: 'legacy' | 'modern' | 'neutral'
-}
-
-export interface Chapter4StateTaxonomyCard {
-  id: 'local' | 'global' | 'remote'
-  title: string
-  subtitle: string
-  definition: string
-  backendComparison: string
-  implementationTips: string[]
-}
-
-export interface Chapter4StatePatternCard {
-  id: 'provide-inject' | 'global-store'
-  title: string
-  subtitle: string
-  backendComparison: string
-  suitableScenarios: string[]
-  tradeoffs: string[]
 }
 
 export interface Chapter4AntiPattern {
@@ -44,273 +24,286 @@ export interface Chapter4BestPractice {
 }
 
 export interface Chapter4FlowStage {
-  id: 'state-input' | 'mapping-function' | 'ui-output' | 'feedback-loop'
+  id: 'data-source' | 'mapping-chain' | 'render-output' | 'feedback-loop'
   title: string
   description: string
   keyCheck: string
 }
 
-export interface Chapter4EvidenceLink {
-  kind: 'state-taxonomy' | 'state-pattern' | 'anti-pattern' | 'best-practice'
-  ids: string[]
+export interface Chapter4RepoEvidence {
+  id: 'data' | 'mapping' | 'render' | 'feedback'
+  title: string
+  summary: string
+  repoPaths: string[]
+  checks: string[]
 }
 
-export interface Chapter4ConceptSection {
+export interface Chapter4PracticeSection {
   id: '4.1' | '4.2' | '4.3'
   title: string
   subtitle: string
+  objective: string
   what: string[]
   why: string[]
   how: string[]
-  backendComparisons: string[]
   codeSamples: Chapter4CodeSample[]
-  evidenceLinks: Chapter4EvidenceLink[]
+  repoEvidence?: Chapter4RepoEvidence[]
+  antiPatternIds?: Chapter4AntiPattern['id'][]
+  bestPracticeIds?: Chapter4BestPractice['id'][]
 }
 
 export interface Chapter4Content {
-  pageTitle: string
+  pageTitle: '第四章：端到端项目实践'
   pageSubtitle: string
   chapterSummary: string
   formulaRelation: string
-  responsibilityBoundary: ResponsibilityBoundary
   flowStages: Chapter4FlowStage[]
-  conceptSections: Chapter4ConceptSection[]
-  stateTaxonomyCards: Chapter4StateTaxonomyCard[]
-  statePatternCards: Chapter4StatePatternCard[]
+  conceptSections: Chapter4PracticeSection[]
   antiPatterns: Chapter4AntiPattern[]
   bestPractices: Chapter4BestPractice[]
 }
 
 export const chapter4Content: Chapter4Content = {
-  pageTitle: '第四章：状态链路串讲',
-  pageSubtitle: 'State-to-UI Chain Guide',
-  chapterSummary: '本章不绑定具体项目，直接用通用链路讲清 States、f() 与 UI 的协作方式。',
+  pageTitle: '第四章：端到端项目实践',
+  pageSubtitle: 'Repository-Driven End-to-End Practice',
+  chapterSummary:
+    '本章不再讲抽象概念，而是直接复盘当前仓库如何把 src/data、router、views 和组件串成一条可追踪的 UI = f(States) 工程链路。',
   formulaRelation:
-    '第四章聚焦 UI = f(States) 的运行链路：先建模状态输入，再定义映射函数，最后得到稳定 UI，并通过反馈闭环持续修正。',
-  responsibilityBoundary: {
-    frontend: ['定义状态分层与组件边界', '维护状态到 UI 的映射关系', '管理副作用生命周期与交互反馈'],
-    backend: ['提供稳定字段与错误模型', '保证接口语义和权限边界', '支持前端状态恢复和重试策略'],
-    contract: ['约定字段可空性与默认值', '约定分页/过滤/排序协议', '约定错误码和兼容策略']
-  },
+    '第四章聚焦“公式落地证据”：数据源定义 States，路由与组件承担 f()，页面输出 UI，并通过交互反馈形成可验证闭环。',
   flowStages: [
     {
-      id: 'state-input',
-      title: '阶段 1：状态输入',
-      description: '先识别 Local / Global / Remote 三类状态，确定谁拥有写权限。',
-      keyCheck: '同一份业务状态是否只有一个写入口？'
+      id: 'data-source',
+      title: '阶段 1：数据源定义',
+      description: '在 src/data 中定义章节状态结构，作为页面渲染的唯一输入。',
+      keyCheck: '章节文案与结构是否只在数据层维护一份？'
     },
     {
-      id: 'mapping-function',
-      title: '阶段 2：映射函数 f()',
-      description: '用 props、computed、v-for、v-if 把状态映射成可预测的界面结构。',
-      keyCheck: '模板里是否只做展示，派生逻辑是否收敛在 computed？'
+      id: 'mapping-chain',
+      title: '阶段 2：映射链路组装',
+      description: 'views 读取 data，并通过 props 把状态映射到章节卡片与代码面板。',
+      keyCheck: '模板是否只表达渲染，派生逻辑是否收敛在 script/computed？'
     },
     {
-      id: 'ui-output',
-      title: '阶段 3：UI 输出',
-      description: '确保同一状态输入得到同一 UI 输出，避免手动 DOM 侧写。',
-      keyCheck: '是否仍有 querySelector 这类绕过状态层的更新？'
+      id: 'render-output',
+      title: '阶段 3：渲染输出稳定',
+      description: '同一输入应产出同一 UI，避免手动 DOM 绕过状态系统。',
+      keyCheck: '是否存在 querySelector 等不受控 UI 修改路径？'
     },
     {
       id: 'feedback-loop',
-      title: '阶段 4：反馈闭环',
-      description: '把交互反馈、异步错误和重试纳入状态机，形成可恢复链路。',
-      keyCheck: '失败态、恢复态、清理时机是否都有显式建模？'
+      title: '阶段 4：交互反馈闭环',
+      description: '复制按钮、错误态与清理逻辑显式建模，保证可恢复与可回归。',
+      keyCheck: '交互是否覆盖建立、更新、清理三个时机？'
     }
   ],
   conceptSections: [
     {
       id: '4.1',
-      title: '状态输入建模',
-      subtitle: '结论：先分层，再编码。',
-      what: ['States 不是一个变量，而是一组有边界的数据输入。', '先区分 Local / Global / Remote，再决定存放位置。'],
-      why: ['分层清楚后，状态来源和写入责任可追踪。', '先建模可以减少后期重构和状态迁移成本。'],
-      how: ['用类型定义状态结构与可选字段。', '为每类状态明确唯一写入口和读取范围。'],
-      backendComparisons: ['类似后端先定义领域模型再写业务逻辑。', '类似接口分层：DTO、缓存态、会话态职责分离。'],
-      codeSamples: [
+      title: '链路建立：从数据源到页面',
+      subtitle: '结论：先让链路可追踪，再谈优化。',
+      objective: '把“数据从哪里来、如何到页面”讲成可定位的仓库路径。',
+      what: [
+        '第四章以当前仓库为唯一案例，不使用脱离上下文的伪项目。',
+        '状态输入来自 src/data，路由和页面组件只做映射，不复制业务真相。',
+        '架构图与证据卡对应真实文件，便于评审与新人 onboarding。'
+      ],
+      why: [
+        '当链路被文件路径锚定，任何偏差都能快速定位到责任层。',
+        '“讲概念”容易漂移，“讲仓库证据”可以直接做回归。',
+        '跨角色协作时，前后端能在同一条链路上对齐接口和状态边界。'
+      ],
+      how: [
+        '统一在 src/data 维护章节输入，不在视图层重复拼装主数据。',
+        'view 只做遍历与组合，把复杂展示逻辑下放到章节组件。',
+        '每个关键节点给出检查点，形成可执行验收清单。'
+      ],
+      repoEvidence: [
         {
-          id: '4.1-state-modeling',
-          title: '状态分层建模示例',
-          language: 'typescript',
-          tone: 'neutral',
-          code: `type AsyncStatus = 'idle' | 'loading' | 'success' | 'error'
-
-interface UiState {
-  draftKeyword: string // local
-  activeTab: 'all' | 'mine' // local
-  currentUserId: string // global
-  listStatus: AsyncStatus // remote-meta
-}`
+          id: 'data',
+          title: '证据 1：数据源层（States）',
+          summary: '章节元信息与章节正文都在 data 层定义，保证单一数据源。',
+          repoPaths: ['src/data/chapters.ts', 'src/data/chapter4.ts'],
+          checks: ['章节卡片标题与详情页标题一致', '章节小节编号与页面渲染顺序一致']
+        },
+        {
+          id: 'mapping',
+          title: '证据 2：映射层（f 的入口）',
+          summary: 'Chapter4View 读取 chapter4Content，并按 section 逐段渲染组件。',
+          repoPaths: ['src/views/Chapter4View.vue', 'src/components/chapter/chapter4/StateConceptSectionCard.vue'],
+          checks: ['页面不直接硬编码业务内容', '组件通过 props 接受结构化数据']
+        },
+        {
+          id: 'render',
+          title: '证据 3：渲染层（UI 输出）',
+          summary: '模板采用声明式渲染，输入一致时输出保持稳定。',
+          repoPaths: ['src/components/chapter/chapter4/StateConceptSectionCard.vue'],
+          checks: ['模板无手动 DOM 操作', '相同 section 输入渲染一致']
+        },
+        {
+          id: 'feedback',
+          title: '证据 4：反馈层（交互闭环）',
+          summary: '代码复制交互显式维护状态与清理逻辑，支持回归验证。',
+          repoPaths: ['src/components/chapter/chapter4/CodeSnippetPanel.vue', 'src/utils/clipboard.ts'],
+          checks: ['复制状态 1.6s 后恢复', '组件卸载时清理 timer']
         }
       ],
-      evidenceLinks: [
-        { kind: 'state-taxonomy', ids: ['local', 'global', 'remote'] },
-        { kind: 'state-pattern', ids: ['provide-inject', 'global-store'] }
+      codeSamples: [
+        {
+          id: '4.1-repo-chain',
+          title: '真实链路：data -> view -> section component',
+          language: 'typescript',
+          tone: 'neutral',
+          code: `// src/data/chapter4.ts
+export const chapter4Content = {
+  pageTitle: '第四章：端到端项目实践',
+  conceptSections: [{ id: '4.1', title: '链路建立：从数据源到页面' }]
+}
+
+// src/views/Chapter4View.vue
+<StateConceptSectionCard
+  v-for="section in chapter4Content.conceptSections"
+  :key="section.id"
+  :section="section"
+  :anti-patterns="chapter4Content.antiPatterns"
+  :best-practices="chapter4Content.bestPractices"
+/>`
+        }
       ]
     },
     {
       id: '4.2',
-      title: '映射函数与数据流正确性',
-      subtitle: '结论：状态下行，事件上行。',
-      what: ['f() 的核心是把状态映射为 UI，而不是手工操作 DOM。', '单向数据流要求 props 只读，写操作通过事件回到上层。'],
-      why: ['数据流方向固定后，变更路径更容易定位。', '避免隐式写入可以降低跨组件耦合。'],
-      how: ['把复杂派生逻辑放进 computed。', '异步流程统一建模为状态机并处理错误分支。'],
-      backendComparisons: ['类似命令与查询分离：读和写路径明确。', '类似后端统一异常处理，避免业务层吞错。'],
+      title: '反模式修正：从不可追踪到可维护',
+      subtitle: '结论：先消灭坏路径，再扩展功能。',
+      objective: '把常见失控点收敛为可检查的反模式清单，并给出统一修正方式。',
+      what: [
+        '反模式不是“代码丑”，而是破坏了状态到 UI 的可追踪性。',
+        '本节仅聚焦三类高频问题：DOM 直改、单向流破坏、异步状态混乱。',
+        '所有修正都落在“状态建模 + 声明式渲染 + 生命周期清理”。'
+      ],
+      why: [
+        '先修坏路径，后续架构优化才不会被历史债务反复拉回。',
+        '反模式统一命名后，评审时能快速形成共识。',
+        '修正规则可直接转为 lint 约束与 code review 清单。'
+      ],
+      how: [
+        '禁止直接操作 DOM，改为更新状态并让模板渲染。',
+        '子组件保持 props 只读，写操作通过事件回流到上层。',
+        '异步流程用显式状态机覆盖 loading/success/error。'
+      ],
+      antiPatternIds: ['dom-manipulation', 'data-flow-violation', 'async-state-chaos'],
       codeSamples: [
         {
-          id: '4.2-data-flow',
-          title: '单向数据流与异步状态机',
+          id: '4.2-fix-pattern',
+          title: '修正路径：事件上行 + 状态机',
           language: 'vue',
           tone: 'modern',
           code: `const state = reactive({
   status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
-  data: [] as string[],
+  list: [] as string[],
   error: ''
 })
 
-const load = async () => {
+const reload = async () => {
   state.status = 'loading'
   try {
-    state.data = await fetchList()
+    state.list = await fetchChapterList()
     state.status = 'success'
-  } catch (e) {
-    state.error = String(e)
+  } catch (error) {
+    state.error = String(error)
     state.status = 'error'
   }
 }`
         }
-      ],
-      evidenceLinks: [
-        { kind: 'state-pattern', ids: ['provide-inject', 'global-store'] },
-        { kind: 'anti-pattern', ids: ['dom-manipulation', 'data-flow-violation', 'async-state-chaos'] }
       ]
     },
     {
       id: '4.3',
-      title: '输出与反馈闭环',
-      subtitle: '结论：可建立、可恢复、可清理。',
-      what: ['UI 输出必须可预测：同一状态输入得到同一渲染结果。', '反馈链路要覆盖成功、失败与恢复三个阶段。'],
-      why: ['闭环状态能让用户知道系统当前所处阶段。', '副作用可清理可以降低重渲染带来的风险。'],
-      how: ['统一使用状态驱动渲染，不直接改 DOM。', '在生命周期中清理订阅和定时器。'],
-      backendComparisons: ['类似事务边界：副作用有开始和结束。', '类似重试机制：失败路径必须可恢复。'],
+      title: '实践清单：验收、回归与演进',
+      subtitle: '结论：把经验固化成可执行清单。',
+      objective: '将最佳实践沉淀为验收项，避免“讲完就散”。',
+      what: [
+        '最佳实践需要可验证，否则只会停留在口号层。',
+        '本节把单一数据源、状态驱动渲染、副作用隔离变成回归项。',
+        '验收流程直接绑定本仓库命令和页面行为。'
+      ],
+      why: [
+        '可执行清单能降低版本迭代中的回归风险。',
+        '团队成员变更时，清单是最稳定的协作接口。',
+        '把“主观经验”转成“客观检查点”，减少争议。'
+      ],
+      how: [
+        '发布前执行类型检查与构建，确保契约稳定。',
+        '手工验证 /chapter/4 页面结构与交互顺序。',
+        '每次需求改动后复查最佳实践三条基线。'
+      ],
+      bestPracticeIds: ['single-source-truth', 'state-driven-ui', 'side-effect-isolation'],
       codeSamples: [
         {
-          id: '4.3-feedback-loop',
-          title: '反馈闭环与副作用清理',
-          language: 'vue',
-          tone: 'modern',
-          code: `const copied = ref(false)
-let timer: ReturnType<typeof setTimeout> | null = null
+          id: '4.3-verification',
+          title: '回归清单：命令与页面验收',
+          language: 'javascript',
+          tone: 'neutral',
+          code: `// 1) 工程检查
+pnpm type-check
+pnpm build-only
 
-const handleCopy = () => {
-  copied.value = true
-  timer = setTimeout(() => {
-    copied.value = false
-  }, 1600)
-}
-
-onBeforeUnmount(() => {
-  if (timer) clearTimeout(timer)
-})`
+// 2) 页面验收
+// /chapter/4:
+// - 架构图只出现一次
+// - 4.2 仅展示反模式
+// - 4.3 仅展示最佳实践
+// - 代码复制按钮可恢复`
         }
-      ],
-      evidenceLinks: [
-        { kind: 'best-practice', ids: ['single-source-truth', 'state-driven-ui', 'side-effect-isolation'] },
-        { kind: 'anti-pattern', ids: ['async-state-chaos'] }
       ]
-    }
-  ],
-  stateTaxonomyCards: [
-    {
-      id: 'local',
-      title: 'Local State',
-      subtitle: '组件内部状态',
-      definition: '只在当前组件有效，随组件创建与销毁。',
-      backendComparison: '对应方法内局部变量，作用域最小。',
-      implementationTips: ['默认优先本地维护', '仅在复用需求明确时再提升']
-    },
-    {
-      id: 'global',
-      title: 'Global State',
-      subtitle: '跨页面共享状态',
-      definition: '多个模块都依赖的共享状态，需要统一读写入口。',
-      backendComparison: '类似单例服务，强调一致性和可追踪。',
-      implementationTips: ['按领域拆分 Store', '禁止把短期状态放入全局']
-    },
-    {
-      id: 'remote',
-      title: 'Remote Data',
-      subtitle: '服务端源数据',
-      definition: '主数据在服务端，前端负责拉取、缓存和恢复。',
-      backendComparison: '对应外部 API 响应，需要处理超时和失败。',
-      implementationTips: ['状态与数据分离建模', '显式处理错误与重试']
-    }
-  ],
-  statePatternCards: [
-    {
-      id: 'provide-inject',
-      title: 'Provide / Inject',
-      subtitle: '组件树上下文共享',
-      backendComparison: '类似 IoC 注入，避免深层 props 透传。',
-      suitableScenarios: ['主题/语言/权限上下文', '同组件树的跨层共享'],
-      tradeoffs: ['跨页面能力有限', '依赖命名规范保障可维护性']
-    },
-    {
-      id: 'global-store',
-      title: 'Global Store（Pinia）',
-      subtitle: '集中式共享状态',
-      backendComparison: '类似应用级服务，统一状态入口。',
-      suitableScenarios: ['跨页面共享登录态、权限态', '复杂链路需要可追踪状态变化'],
-      tradeoffs: ['拆分不当会形成巨型 Store', '需要严格约束读写边界']
     }
   ],
   antiPatterns: [
     {
       id: 'dom-manipulation',
       title: '反模式 1：直接操作 DOM',
-      problem: '绕过状态层，导致状态与 UI 不一致。',
+      problem: '绕过状态层会导致 UI 与业务状态分离，问题来源不可追踪。',
       wrongApproach: 'document.querySelector(...).appendChild(...)',
-      correctApproach: '只更新 state，让模板自动重渲染',
-      impact: ['来源不可追踪', '难以复用框架调度优化', '维护成本快速上升']
+      correctApproach: '更新响应式状态，让模板重渲染',
+      impact: ['调试路径断裂', '难以复用框架调度优化', '回归成本上升']
     },
     {
       id: 'data-flow-violation',
       title: '反模式 2：破坏单向数据流',
-      problem: '子组件直接改 props，父层无法感知写入来源。',
+      problem: '子组件直接改 props，父层无法追踪写入来源。',
       wrongApproach: 'props.todo.completed = !props.todo.completed',
-      correctApproach: "emit('toggle') 交由上层更新",
-      impact: ['调试链路变长', '组件职责不清晰', '复用能力下降']
+      correctApproach: "emit('toggle') 交给上层统一更新",
+      impact: ['组件职责混乱', '排查链路变长', '复用能力下降']
     },
     {
       id: 'async-state-chaos',
       title: '反模式 3：异步状态混乱',
-      problem: '只用 isLoading 无法覆盖错误和恢复。',
+      problem: '仅有 isLoading 无法表达失败和恢复。',
       wrongApproach: 'const isLoading = ref(false)',
-      correctApproach: '使用 idle/loading/success/error 状态机',
-      impact: ['错误态不可见', '并发请求容易竞态', '用户反馈中断']
+      correctApproach: '显式状态机：idle/loading/success/error',
+      impact: ['错误不可见', '并发请求易竞态', '用户反馈断层']
     }
   ],
   bestPractices: [
     {
       id: 'single-source-truth',
       title: '最佳实践 1：单一数据源',
-      principle: '状态是唯一真相，UI 只做派生输出。',
-      implementation: ['业务状态集中定义', '禁止在多个组件重复维护同一真相'],
-      benefits: ['定位更直接', '减少状态不一致缺陷']
+      principle: '主数据在 data 层统一维护，视图层只消费不复制。',
+      implementation: ['章节信息统一放在 src/data', '禁止跨组件维护同一业务真相'],
+      benefits: ['来源清晰', '减少数据分叉导致的不一致']
     },
     {
       id: 'state-driven-ui',
       title: '最佳实践 2：状态驱动 UI',
-      principle: '通过状态变化触发渲染，不手动写 DOM。',
-      implementation: ['使用 v-if/v-for/computed 描述 UI', '模板只表达“显示什么”'],
-      benefits: ['输出可预测', '降低维护和排错成本']
+      principle: '通过状态变化触发渲染，不走手动 DOM 通道。',
+      implementation: ['使用 v-if/v-for/computed 描述 UI', '模板仅负责表达输出结构'],
+      benefits: ['输出可预测', '评审和测试成本更低']
     },
     {
       id: 'side-effect-isolation',
       title: '最佳实践 3：副作用隔离',
-      principle: '副作用要有建立、更新、清理三个时机。',
-      implementation: ['在生命周期钩子中管理副作用', '卸载时统一清理定时器和订阅'],
-      benefits: ['减少内存泄漏', '避免副作用重复执行']
+      principle: '副作用要明确建立、更新、清理时机。',
+      implementation: ['用生命周期钩子管理 timer/订阅', '组件卸载前做统一清理'],
+      benefits: ['避免内存泄漏', '降低重渲染期间副作用污染']
     }
   ]
 }

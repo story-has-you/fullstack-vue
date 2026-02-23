@@ -72,13 +72,13 @@ export const chapters: Chapter[] = [
     number: 4,
     title: '第四章',
     subtitle: '端到端项目实践',
-    description: '用当前仓库真实链路串起 States、f()、UI，并对照反模式与最佳实践。',
+    description: '基于当前仓库真实链路，串起数据源、路由、组件渲染与交互反馈，完成 UI = f(States) 工程闭环。',
     icon: 'shield',
     color: 'teal',
     sections: [
-      { id: '4.1', title: '项目中的公式落地' },
-      { id: '4.2', title: '反模式与修正' },
-      { id: '4.3', title: '工程实践总结' }
+      { id: '4.1', title: '链路建立：从数据源到页面' },
+      { id: '4.2', title: '反模式修正：从不可追踪到可维护' },
+      { id: '4.3', title: '实践清单：验收、回归与演进' }
     ],
     route: '/chapter/4'
   },

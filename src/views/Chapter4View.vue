@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ProjectArchitectureDiagram from '@/components/chapter/chapter4/ProjectArchitectureDiagram.vue'
 import StateConceptSectionCard from '@/components/chapter/chapter4/StateConceptSectionCard.vue'
 import FormulaRelationPanel from '@/components/common/FormulaRelationPanel.vue'
 import { chapter4Content } from '@/data/chapter4'
@@ -27,31 +28,13 @@ import { chapter4Content } from '@/data/chapter4'
 
       <FormulaRelationPanel :relation="chapter4Content.formulaRelation" />
 
-      <section class="mb-8 rounded-3xl border border-amber-100 bg-amber-50/50 p-6">
-        <h2 class="text-xl font-bold text-amber-900">链路总览（States -> f() -> UI）</h2>
-        <p class="mt-2 text-sm leading-relaxed text-slate-700">
-          先确认状态输入，再定义映射函数，得到可预测 UI，并通过反馈闭环持续修正。
-        </p>
-        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <article
-            v-for="stage in chapter4Content.flowStages"
-            :key="stage.id"
-            class="rounded-xl border border-amber-100 bg-white/90 p-4"
-          >
-            <h3 class="text-sm font-semibold text-amber-900">{{ stage.title }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-slate-700">{{ stage.description }}</p>
-            <p class="mt-2 text-xs font-medium text-slate-600">检查点：{{ stage.keyCheck }}</p>
-          </article>
-        </div>
-      </section>
+      <ProjectArchitectureDiagram :flow-stages="chapter4Content.flowStages" />
 
       <section class="space-y-8">
         <StateConceptSectionCard
           v-for="section in chapter4Content.conceptSections"
           :key="section.id"
           :section="section"
-          :state-taxonomy-cards="chapter4Content.stateTaxonomyCards"
-          :state-pattern-cards="chapter4Content.statePatternCards"
           :anti-patterns="chapter4Content.antiPatterns"
           :best-practices="chapter4Content.bestPractices"
         />
