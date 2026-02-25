@@ -23,37 +23,6 @@ export const chapters: Chapter[] = [
     id: 'chapter1',
     number: 1,
     title: '第一章',
-    subtitle: 'States (输入建模)',
-    description: '先定义状态分类、作用域和状态迁移，再谈渲染与交互。',
-    icon: 'zap',
-    color: 'indigo',
-    sections: [
-      { id: '2.0', title: '什么是状态' },
-      { id: '2.1', title: '状态分类学' },
-      { id: '2.2', title: '状态管理模式' }
-    ],
-    route: '/chapter/1'
-  },
-  {
-    id: 'chapter2',
-    number: 2,
-    title: '第二章',
-    subtitle: 'f() (响应式绑定机制)',
-    description: '理解状态变化如何被感知、调度并映射为最小化 UI 更新。',
-    icon: 'repeat',
-    color: 'cyan',
-    sections: [
-      { id: '3.1', title: '响应式系统原理' },
-      { id: '3.2', title: 'MVVM 与双向绑定' },
-      { id: '3.3', title: '单向数据流' },
-      { id: '3.4', title: '副作用生命周期' }
-    ],
-    route: '/chapter/2'
-  },
-  {
-    id: 'chapter3',
-    number: 3,
-    title: '第三章',
     subtitle: 'UI (声明式表达与组件化)',
     description: '将状态映射成可维护 UI：声明式分支、组件边界和列表身份。',
     icon: 'monitor',
@@ -64,6 +33,37 @@ export const chapters: Chapter[] = [
       { id: '1.3', title: '组件化架构' },
       { id: '1.4', title: '示例：命令事件上抛' },
       { id: '1.5', title: '示例：key 策略' }
+    ],
+    route: '/chapter/1'
+  },
+  {
+    id: 'chapter2',
+    number: 2,
+    title: '第二章',
+    subtitle: 'State (输入建模)',
+    description: '先定义状态分类、作用域和状态迁移，再谈渲染与交互。',
+    icon: 'zap',
+    color: 'indigo',
+    sections: [
+      { id: '2.0', title: '什么是状态' },
+      { id: '2.1', title: '状态分类学' },
+      { id: '2.2', title: '状态管理模式' }
+    ],
+    route: '/chapter/2'
+  },
+  {
+    id: 'chapter3',
+    number: 3,
+    title: '第三章',
+    subtitle: '绑定 (f() 响应式机制)',
+    description: '理解状态变化如何被感知、调度并映射为最小化 UI 更新。',
+    icon: 'repeat',
+    color: 'cyan',
+    sections: [
+      { id: '3.1', title: '响应式系统原理' },
+      { id: '3.2', title: 'MVVM 与双向绑定' },
+      { id: '3.3', title: '单向数据流' },
+      { id: '3.4', title: '副作用生命周期' }
     ],
     route: '/chapter/3'
   },

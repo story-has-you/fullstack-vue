@@ -54,7 +54,7 @@ export interface Chapter2Content {
 }
 
 export const chapter2Content: Chapter2Content = {
-  pageTitle: '第一章：States (状态层)',
+  pageTitle: '第二章：State (状态层)',
   pageSubtitle: 'State Management',
   chapterSummary:
     '本章聚焦 UI = f(States) 公式中的 States：状态分类学 (Local/Global/Remote) 与状态管理模式（避免 Prop Drilling、使用 Pinia）。理解如何对状态进行分层治理。',
@@ -128,7 +128,6 @@ const handleInput = (value: string) => {
 }`
         }
       ],
-      demoComponent: 'StateBasicDemo',
       analogies: [
         '电灯开关：你按一下，灯从"关"变成"开"，这个开/关就是布尔状态',
         '购物车徽章：每加一件商品，数字从 0 变成 1、2、3...，这个数字就是数字状态',

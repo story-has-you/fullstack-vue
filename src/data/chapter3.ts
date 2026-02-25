@@ -30,7 +30,7 @@ export interface Chapter3Content {
 }
 
 export const chapter3Content: Chapter3Content = {
-  pageTitle: '第二章：f() - 响应式绑定机制',
+  pageTitle: '第三章：绑定 (f() - 响应式机制)',
   pageSubtitle: 'Reactive Binding Mechanism',
   chapterSummary:
     '本章讲 UI = f(States) 里的 f()：状态变了，界面为什么会自动更新。会用通俗方式讲清 Proxy、依赖收集、调度、v-model 和副作用管理。',

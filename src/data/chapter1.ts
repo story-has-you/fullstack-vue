@@ -40,7 +40,7 @@ export interface Chapter1Content {
 }
 
 export const chapter1Content: Chapter1Content = {
-  pageTitle: '第三章：UI (用户界面层)',
+  pageTitle: '第一章：UI (用户界面层)',
   pageSubtitle: 'User Interface Layer',
   chapterSummary:
     '本章只讲 UI 层：怎么用声明式写法描述界面、怎么用组件拆分页面、以及虚拟 DOM 如何高效更新。目标是用“看状态写界面”替代手动改 DOM。',

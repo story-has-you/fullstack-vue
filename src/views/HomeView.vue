@@ -42,7 +42,7 @@ const learningPaths: LearningPath[] = [
     id: 'basic',
     title: '基础篇',
     range: '前言 + 第 1-3 章',
-    detail: '建立 States → f() → UI 的核心主线',
+    detail: '建立 UI → State → 绑定(f()) 的核心主线',
     icon: 'basicPath'
   },
   {

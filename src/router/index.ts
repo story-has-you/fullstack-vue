@@ -27,20 +27,20 @@ const router = createRouter({
     {
       path: '/chapter/1',
       name: 'chapter1',
-      component: Chapter2View,
-      meta: { title: '全栈思维跃迁 - 第一章：States (输入建模)' }
+      component: Chapter1View,
+      meta: { title: '全栈思维跃迁 - 第一章：UI (声明式表达与组件化)' }
     },
     {
       path: '/chapter/2',
       name: 'chapter2',
-      component: Chapter3View,
-      meta: { title: '全栈思维跃迁 - 第二章：f() (响应式绑定机制)' }
+      component: Chapter2View,
+      meta: { title: '全栈思维跃迁 - 第二章：State (输入建模)' }
     },
     {
       path: '/chapter/3',
       name: 'chapter3',
-      component: Chapter1View,
-      meta: { title: '全栈思维跃迁 - 第三章：UI (声明式表达与组件化)' }
+      component: Chapter3View,
+      meta: { title: '全栈思维跃迁 - 第三章：绑定 (f() 响应式机制)' }
     },
     {
       path: '/chapter/4',
