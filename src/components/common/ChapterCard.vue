@@ -12,55 +12,94 @@ interface Props {
 
 defineProps<Props>()
 
+interface ChapterColorTheme {
+  border: string
+  background: string
+  text: string
+}
+
+const defaultTheme: ChapterColorTheme = {
+  border: 'border-gray-500',
+  background: 'bg-gray-50',
+  text: 'text-gray-700'
+}
+
+const chapterColorThemes: Record<string, ChapterColorTheme> = {
+  blue: {
+    border: 'border-sky-500 hover:border-sky-600',
+    background: 'bg-sky-50',
+    text: 'text-sky-700'
+  },
+  purple: {
+    border: 'border-violet-500 hover:border-violet-600',
+    background: 'bg-violet-50',
+    text: 'text-violet-700'
+  },
+  indigo: {
+    border: 'border-indigo-500 hover:border-indigo-600',
+    background: 'bg-indigo-50',
+    text: 'text-indigo-700'
+  },
+  cyan: {
+    border: 'border-cyan-500 hover:border-cyan-600',
+    background: 'bg-cyan-50',
+    text: 'text-cyan-700'
+  },
+  teal: {
+    border: 'border-teal-500 hover:border-teal-600',
+    background: 'bg-teal-50',
+    text: 'text-teal-700'
+  },
+  emerald: {
+    border: 'border-emerald-500 hover:border-emerald-600',
+    background: 'bg-emerald-50',
+    text: 'text-emerald-700'
+  },
+  green: {
+    border: 'border-green-500 hover:border-green-600',
+    background: 'bg-green-50',
+    text: 'text-green-700'
+  },
+  amber: {
+    border: 'border-amber-500 hover:border-amber-600',
+    background: 'bg-amber-50',
+    text: 'text-amber-700'
+  }
+}
+
+const resolveTheme = (color: string): ChapterColorTheme => {
+  return chapterColorThemes[color] ?? defaultTheme
+}
+
 /**
  * 获取章节颜色类名
  */
-const getColorClass = (color: string) => {
-  const colorMap: Record<string, string> = {
-    blue: 'border-sky-500 hover:border-sky-600',
-    purple: 'border-violet-500 hover:border-violet-600',
-    indigo: 'border-indigo-500 hover:border-indigo-600',
-    cyan: 'border-cyan-500 hover:border-cyan-600',
-    teal: 'border-teal-500 hover:border-teal-600',
-    emerald: 'border-emerald-500 hover:border-emerald-600',
-    green: 'border-green-500 hover:border-green-600',
-    amber: 'border-amber-500 hover:border-amber-600'
-  }
-  return colorMap[color] || 'border-gray-500'
+const getColorClass = (color: string): string => {
+  return resolveTheme(color).border
 }
 
 /**
  * 获取章节背景色类名
  */
-const getBgColorClass = (color: string) => {
-  const colorMap: Record<string, string> = {
-    blue: 'bg-sky-50',
-    purple: 'bg-violet-50',
-    indigo: 'bg-indigo-50',
-    cyan: 'bg-cyan-50',
-    teal: 'bg-teal-50',
-    emerald: 'bg-emerald-50',
-    green: 'bg-green-50',
-    amber: 'bg-amber-50'
-  }
-  return colorMap[color] || 'bg-gray-50'
+const getBgColorClass = (color: string): string => {
+  return resolveTheme(color).background
 }
 
 /**
  * 获取章节文本色类名
  */
-const getTextColorClass = (color: string) => {
-  const colorMap: Record<string, string> = {
-    blue: 'text-sky-700',
-    purple: 'text-violet-700',
-    indigo: 'text-indigo-700',
-    cyan: 'text-cyan-700',
-    teal: 'text-teal-700',
-    emerald: 'text-emerald-700',
-    green: 'text-green-700',
-    amber: 'text-amber-700'
+const getTextColorClass = (color: string): string => {
+  return resolveTheme(color).text
+}
+
+const getChapterLabel = (number: number): string => {
+  if (number === 0) {
+    return '前言'
   }
-  return colorMap[color] || 'text-gray-700'
+  if (number === 8) {
+    return '结语'
+  }
+  return `第${number}章`
 }
 </script>
 
@@ -86,7 +125,7 @@ const getTextColorClass = (color: string) => {
         class="rounded-full px-3 py-1 text-sm font-semibold"
         :class="[getBgColorClass(chapter.color), getTextColorClass(chapter.color)]"
       >
-        {{ chapter.number === 0 ? '前言' : chapter.number === 8 ? '结语' : `第${chapter.number}章` }}
+        {{ getChapterLabel(chapter.number) }}
       </span>
     </div>
 

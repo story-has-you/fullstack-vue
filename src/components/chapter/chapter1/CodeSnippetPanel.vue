@@ -10,49 +10,47 @@ interface Props {
   tone: 'legacy' | 'modern' | 'neutral'
 }
 
+interface ToneStyle {
+  panel: string
+  header: string
+  copyButton: string
+}
+
+const toneStyleMap: Record<Props['tone'], ToneStyle> = {
+  legacy: {
+    panel: 'border-rose-200',
+    header: 'border-slate-700 bg-rose-950/40 text-rose-200',
+    copyButton: 'border-rose-300/60 bg-rose-900/35 text-rose-100 hover:bg-rose-900/60'
+  },
+  modern: {
+    panel: 'border-emerald-200',
+    header: 'border-slate-700 bg-emerald-950/35 text-emerald-200',
+    copyButton: 'border-emerald-300/60 bg-emerald-900/35 text-emerald-100 hover:bg-emerald-900/60'
+  },
+  neutral: {
+    panel: 'border-sky-200',
+    header: 'border-slate-700 bg-slate-800 text-slate-200',
+    copyButton: 'border-slate-500 bg-slate-700 text-slate-100 hover:bg-slate-600'
+  }
+}
+
 const props = defineProps<Props>()
 const codeRef = ref<HTMLElement | null>(null)
 const isCopied = ref(false)
 let copyTimer: ReturnType<typeof setTimeout> | null = null
 
-const normalizedLanguage = computed(() => {
+const normalizedLanguage = computed((): 'javascript' | 'xml' | 'typescript' => {
   if (props.language === 'vue') {
     return 'xml'
   }
   return props.language
 })
 
-const panelClass = computed(() => {
-  if (props.tone === 'legacy') {
-    return 'border-rose-200'
-  }
-  if (props.tone === 'modern') {
-    return 'border-emerald-200'
-  }
-  return 'border-sky-200'
+const toneStyle = computed((): ToneStyle => {
+  return toneStyleMap[props.tone]
 })
 
-const headerClass = computed(() => {
-  if (props.tone === 'legacy') {
-    return 'border-slate-700 bg-rose-950/40 text-rose-200'
-  }
-  if (props.tone === 'modern') {
-    return 'border-slate-700 bg-emerald-950/35 text-emerald-200'
-  }
-  return 'border-slate-700 bg-slate-800 text-slate-200'
-})
-
-const copyButtonClass = computed(() => {
-  if (props.tone === 'legacy') {
-    return 'border-rose-300/60 bg-rose-900/35 text-rose-100 hover:bg-rose-900/60'
-  }
-  if (props.tone === 'modern') {
-    return 'border-emerald-300/60 bg-emerald-900/35 text-emerald-100 hover:bg-emerald-900/60'
-  }
-  return 'border-slate-500 bg-slate-700 text-slate-100 hover:bg-slate-600'
-})
-
-const highlightCode = async () => {
+const highlightCode = async (): Promise<void> => {
   const [{ default: hljs }, { default: javascript }, { default: typescript }, { default: xml }] =
     await Promise.all([
       import('highlight.js/lib/core'),
@@ -75,7 +73,7 @@ onMounted(async () => {
   await highlightCode()
 })
 
-const copyCode = async () => {
+const copyCode = async (): Promise<void> => {
   try {
     await copyTextToClipboard(props.code)
     isCopied.value = true
@@ -98,13 +96,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <article class="overflow-hidden rounded-xl border bg-slate-900" :class="panelClass">
-    <div class="flex items-center justify-between border-b px-3 py-2" :class="headerClass">
+  <article class="overflow-hidden rounded-xl border bg-slate-900" :class="toneStyle.panel">
+    <div class="flex items-center justify-between border-b px-3 py-2" :class="toneStyle.header">
       <p class="text-xs font-semibold tracking-wide">{{ title }}</p>
       <button
         type="button"
         class="rounded-md border px-2 py-1 text-[11px] font-semibold transition"
-        :class="copyButtonClass"
+        :class="toneStyle.copyButton"
         @click="copyCode"
       >
         {{ isCopied ? '已复制' : '复制代码' }}

@@ -1,4 +1,6 @@
+import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
+import { chapters } from '@/data/chapters'
 import HomeView from '@/views/HomeView.vue'
 import IntroView from '@/views/IntroView.vue'
 import Chapter1View from '@/views/Chapter1View.vue'
@@ -9,64 +11,67 @@ import Chapter5View from '@/views/Chapter5View.vue'
 import Chapter6View from '@/views/Chapter6View.vue'
 import EpilogueView from '@/views/EpilogueView.vue'
 
+const APP_TITLE = '全栈思维跃迁'
+
+const chapterComponentMap: Record<string, RouteRecordRaw['component']> = {
+  intro: IntroView,
+  chapter1: Chapter1View,
+  chapter2: Chapter2View,
+  chapter3: Chapter3View,
+  chapter4: Chapter4View,
+  chapter5: Chapter5View,
+  chapter6: Chapter6View,
+  epilogue: EpilogueView
+}
+
+const chapterNumberChineseMap: Record<number, string> = {
+  1: '一',
+  2: '二',
+  3: '三',
+  4: '四',
+  5: '五',
+  6: '六',
+  7: '七'
+}
+
+const getChapterRouteName = (id: string, number: number): string => {
+  if (id === 'intro' || id === 'epilogue') {
+    return id
+  }
+  return `chapter${number}`
+}
+
+const getChapterMetaTitle = (id: string, number: number, subtitle: string): string => {
+  if (id === 'intro') {
+    return `${APP_TITLE} - 前言：${subtitle}`
+  }
+  if (id === 'epilogue') {
+    return `${APP_TITLE} - 结语：${subtitle}`
+  }
+  const chapterNumberLabel = chapterNumberChineseMap[number] ?? String(number)
+  return `${APP_TITLE} - 第${chapterNumberLabel}章：${subtitle}`
+}
+
+const chapterRoutes: RouteRecordRaw[] = chapters.map((chapter) => ({
+  path: chapter.route,
+  name: getChapterRouteName(chapter.id, chapter.number),
+  component: chapterComponentMap[chapter.id],
+  meta: { title: getChapterMetaTitle(chapter.id, chapter.number, chapter.subtitle) }
+}))
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView,
+    meta: { title: `${APP_TITLE} - 首页` }
+  },
+  ...chapterRoutes
+]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-      meta: { title: '全栈思维跃迁 - 首页' }
-    },
-    {
-      path: '/intro',
-      name: 'intro',
-      component: IntroView,
-      meta: { title: '全栈思维跃迁 - 前言：公式与认知基线' }
-    },
-    {
-      path: '/chapter/1',
-      name: 'chapter1',
-      component: Chapter1View,
-      meta: { title: '全栈思维跃迁 - 第一章：UI (声明式表达与组件化)' }
-    },
-    {
-      path: '/chapter/2',
-      name: 'chapter2',
-      component: Chapter2View,
-      meta: { title: '全栈思维跃迁 - 第二章：State (输入建模)' }
-    },
-    {
-      path: '/chapter/3',
-      name: 'chapter3',
-      component: Chapter3View,
-      meta: { title: '全栈思维跃迁 - 第三章：绑定 (f() 响应式机制)' }
-    },
-    {
-      path: '/chapter/4',
-      name: 'chapter4',
-      component: Chapter4View,
-      meta: { title: '全栈思维跃迁 - 第四章：端到端项目实践' }
-    },
-    {
-      path: '/chapter/5',
-      name: 'chapter5',
-      component: Chapter5View,
-      meta: { title: '全栈思维跃迁 - 第五章：执行环境与渲染策略' }
-    },
-    {
-      path: '/chapter/6',
-      name: 'chapter6',
-      component: Chapter6View,
-      meta: { title: '全栈思维跃迁 - 第六章：工程化体系' }
-    },
-    {
-      path: '/epilogue',
-      name: 'epilogue',
-      component: EpilogueView,
-      meta: { title: '全栈思维跃迁 - 结语：全栈视角闭环' }
-    }
-  ],
+  routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
@@ -76,7 +81,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  document.title = (to.meta.title as string) || '全栈思维跃迁'
+  document.title = (to.meta.title as string) || APP_TITLE
   next()
 })
 
